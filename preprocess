@@ -1,0 +1,28 @@
+#! /bin/bash
+
+if [ $# -eq 0 ]; then # show help
+    echo "Used to preprocss some file: like compile scss, cleanup html before reload browsers"
+    exit 1
+fi
+
+# this script is runned with CWD = root param passed to http-watcher
+
+# [event file] pairs are passed as command line args
+while [ $# -ne 0 ]; do
+    event=$1; shift             # event name
+    file=$1; shift              # file name
+    extention=${file##*.}       # file extension
+    case $extention in
+        scss) # compile scss to css
+            rake css
+            ;;
+        html)
+            rake generate
+            ;;
+        md) # compress the changed mustache template using htmlcompressor
+            rake generate
+            ;;
+    esac
+done
+
+# http-watcher -ignores _site -command ./preprocess

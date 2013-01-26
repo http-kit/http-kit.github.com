@@ -1,0 +1,104 @@
+---
+layout: bounce
+title: http-kit
+---
+
+<div id="landing">
+  <div class="container">
+    <div class="row">
+        <div class="span5">
+          <h1>HTTP Server & Client, async and websocket supported</h1>
+          {% highlight clojure %}
+[http-kit "2.0-rc1"]
+          {% endhighlight %}
+          <h4>Let's build high perfromance Clojure web app</h4>
+          <p>
+            Write from scrach for performance, and for Clojure
+          </p>
+          <p>
+            Concurrent made easy by asynchronous, promise, callback, and Clojure's functional nature
+          </p>
+          <p>
+
+          </p>
+        </div>
+        <div class="span7">
+          <h3>HTTP Server</h3>
+          {% highlight clojure %}
+(defn async-handler [req]
+  (async-response respond
+  ;; respond is a function, can be saved and called on any thread, any time
+                  (future (respond {:status 200
+                                    :headers {"Content-Type" "text/plain"}
+                                    :body  "hello async"}))))
+(run-server async-handler {:port 8000})
+          {% endhighlight %}
+          <h3>HTTP Client</h3>
+          {% highlight clojure %}
+(let [resp1 (http/get "http://http-kit.org/");; request concurrently, return a promise
+      resp2 (http/get "http://clojure.org")]
+  ;; handle one by one, wait as necessary
+  (println "resp1's status: " (:status @resp1))
+  (println "resp2's status: " (:status @resp2)))
+          {% endhighlight %}
+        </div>
+    </div>
+  </div>
+</div>
+
+<div id="content" class="">
+  <div class="container txt-middle">
+    <div class="row">
+      <div class="row">
+        <div class="span4 bouncy">
+          <h2>Open Source</h2>
+          <p>
+            Apache License, Version 2.0. Source code on <a href="https://github.com/http-kit/http-kit">github</a>.
+            Contributing is just a pull request away!
+          </p>
+          <ul class="bs-docs-social-buttons">
+            <li>
+              <iframe class="github-btn" src="http://ghbtns.com/github-btn.html?user=http-kit&repo=http-kit&type=watch&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="102px" height="20px"></iframe>
+            </li>
+            <li>
+              <iframe class="github-btn" src="http://ghbtns.com/github-btn.html?user=http-kit&repo=http-kit&type=fork&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="100px" height="20px"></iframe>
+            </li>
+          </ul>
+        </div>
+        <div class="span4 bouncy">
+          <h2>Efficient Comet</h2>
+          <p>
+            Efficient long-held HTTP request, push data to browser, exiting standard, works everywhere. Realtime server push made easier.
+          </p>
+        </div>
+        <div class="span4 bouncy">
+          <h2>Websocket</h2>
+          <p>
+            Realtime web application targeting mordern browsers!
+          </p>
+        </div>
+
+      </div>
+      <hr class="dashed">
+      <div class="row">
+        <div class="span4 bouncy">
+          <h2>All-in-one Library</h2>
+          <p>
+            HTTP client/server in one library, a single ~80k jar file. Zero dependency, write from scrach in just ~3000 lines of code. Less is exponentially more!
+          </p>
+        </div>
+        <div class="span4 bouncy">
+          <h2>High performance</h2>
+          <p>
+            http-kit is built for performance. Tens of thousands of requests per second on moderate PC
+          </p>
+        </div>
+        <div class="span4 bouncy">
+          <h2>High Concurrency</h2>
+          <p>
+            A concurrent connection costs nothing but a few kilobytes of RAM: ~10K high traffic concurrent connections with ~128M heap
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>

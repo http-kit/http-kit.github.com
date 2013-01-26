@@ -1,0 +1,44 @@
+---
+layout: bounce
+title: client | http-kit
+---
+<div class="container">
+  <h2>Concurrent made easy by asynchronous, promise, callback</h2>
+{% highlight clojure %}
+;; Asynchronous，return a promise, response is ignored
+(http/get "http://host.com/path")
+
+;; Handle response asynchronously
+(let [options {:timeout 200             ; ms
+               :basic-auth ["user" "pass"]
+               :query-params {:param "value"}
+               :user-agent "User-Agent-string"
+               :headers {"X-Header" "Value"}}]
+  (http/get "http://host.com/path" options
+            (fn [{:keys [status headers body error]}]
+              (if error
+                (println "Failed, exception is " error)
+                (println "Async HTTP GET: " status)))))
+
+;; Synchronous
+(let [{:keys [status headers body error] :as resp} @(http/get "http://host.com/path")]
+  (if error
+    (println "Failed, exception: " error)
+    (println "HTTP GET success: " status)))
+
+;; Concurrent HTTP requests，handle responses in a sync style
+(let [resp1 (http/get "http://host.com/path1")
+      resp2 (http/get "http://host.com/path2")]
+  (println "Response 1's status " {:status @resp1})
+  (println "Response 2's status " {:status @resp2}))
+
+;; Form params
+(let [options {:form-parmas {:name "http-kit" :features ["async" "client" "server"]}}
+      {:keys [status error]} @(http/post "http://host.com/path1" options)]
+  (if error
+    (println "Failed, exception is " error)
+    (println "Async HTTP POST: " status)))
+
+{% endhighlight %}
+
+</div>

@@ -1,0 +1,5 @@
+safe: true
+lsi: false
+markdown: kramdown
+pygments: true
+permalink: "blog/:year/:month/:title"

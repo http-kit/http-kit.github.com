@@ -1,0 +1,51 @@
+---
+layout: bounce
+title: server
+---
+
+<div class="container">
+  <h2>run-server is a drop in replace of run-jetty</h2>
+
+{% highlight clojure %}
+(:use org.httpkit.server)
+
+(defn app [req]
+  {:status  200
+   :headers {"Content-Type" "text/html"}
+   :body    "hello word"})
+
+(run-server app {:port 8080
+                 :thread 4                     ; 4 http worker thread
+                 :queue-size 20480             ; max job queued before reject to project self
+                 :ip "127.0.0.1"               ; bind to localhost
+                 :worker-name-prefix "worker-" ; thread name worker-1, worker-2, worker-3, ......
+                 :max-line 4096                ; max http header line length
+                 :max-body 1048576})           ; max http request body, 1M
+{% endhighlight %}
+
+  <h2>Websocket</h2>
+{% highlight clojure %}
+
+(defn chat-handler [req]
+  (if-ws-request req con
+                 (on-mesg con (fn [msg]
+                                ;; echo back
+                                (send-mesg con msg)))))
+
+(run-server chat-handler {:port 8080})
+{% endhighlight %}
+
+  <h2>Asynchronous (Long polling)</h2>
+
+{% highlight clojure %}
+
+(defn async-handler [req]
+  ; respond is a function, can be called on any thread to send the response to client
+  (async-response respond
+                  (future (respond "hello world async"))))
+
+(run-server async-handler {:port 8080})
+
+{% endhighlight %}
+
+</div>

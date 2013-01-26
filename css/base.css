@@ -1,0 +1,411 @@
+/*!
+ * Bounce Template v2.0
+ *
+ * Built with Bootstrap v2.1.1
+ * http://twitter.github.com/bootstrap
+ */
+
+/* General
+-------------------------------------------------- */
+* {
+    font-weight: normal !important;
+}
+body {
+	position: relative;
+    padding-top: 60px;
+	font-family: 'Open Sans',Helvetica,Arial,sans-serif;
+}
+hr.dashed {
+    border-bottom: 1px dashed #CCCCCC;
+    border-top: medium none;
+}
+.modal-flat {
+    margin-top: 10px;
+    position: relative;
+	z-index: 0;
+}
+
+/* Typography
+-------------------------------------------------- */
+body, button {
+	font-family: 'Open Sans',Helvetica,Arial,sans-serif;
+}
+.txt-lefty {
+    text-align: left;
+}
+.txt-middle {
+    text-align: center;
+}
+.txt-righty {
+    text-align: right;
+}
+
+/* Buttons
+-------------------------------------------------- */
+.btn-action {
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+    font-size: 17px;
+    line-height: normal;
+    padding: 10px 30px;
+}
+.btn-flat {
+	-webkit-border-radius: 0px;
+	-moz-border-radius: 0px;
+	border-radius: 0px;
+}
+.btn-pillbox {
+	-webkit-border-radius: 14px;
+	-moz-border-radius: 14px;
+	border-radius: 14px;
+}
+
+/* Navbar
+-------------------------------------------------- */
+.navbar-fixed-top {
+    margin-bottom: 0;
+}
+.navbar-inner {
+	border-bottom: 0 none;
+	-webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+	-moz-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    filter: none;
+    padding: 10px 0;
+}
+.navbar .brand {
+    font-size: 26px;
+	text-shadow: none;
+}
+.navbar .nav > li > a {
+	font-size: 16px;
+	font-weight: normal;
+    text-shadow: none;
+	-webkit-transition: all .2s linear;
+	-moz-transition: all .2s linear;
+	-ms-transition: all .2s linear;
+	-o-transition: all .2s linear;
+	transition: all .2s linear;	
+}
+.navbar .nav > li > a:hover {
+	-moz-transform: translateY(-5px);
+	-webkit-transform: translateY(-5px);
+	-o-transform: translateY(-5px);
+	-ms-transform: translateY(-5px);
+	transform: translateY(-5px);		
+}
+.navbar .nav > li.active > a,
+.navbar .nav > li.active:hover > a,
+.navbar .nav > .active > a,
+.navbar .nav > .active > a:hover,
+.navbar .nav > .active > a:focus {
+    padding-bottom: 4px;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+	-moz-box-shadow: none;
+}
+.btn-dropnav {
+    float: right;
+    margin-left: 5px;
+    margin-right: 5px;
+    padding: 7px 10px;
+	display: none;
+}
+.btn-dropnav .icon-bar {
+    background-color: #F5F5F5;
+	-webkit-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
+	-moz-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);	
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
+    display: block;
+    height: 2px;
+    width: 18px;
+}
+.btn-dropnav .icon-bar + .icon-bar {
+    margin-top: 3px;
+}
+
+/* Landing
+-------------------------------------------------- */
+#landing {
+    padding: 30px 0;
+}
+#landing .js-video iframe {
+	-webkit-box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.2);
+	-moz-box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.2);
+}
+#landing .carousel {
+    margin-bottom: 0;
+}
+#landing .carousel .item > img {
+    margin: 0 auto;
+}
+#landing .carousel-control {
+    background: none repeat scroll 0 0 transparent;
+    border: medium none;
+	-webkit-border-radius: 0px;
+	-moz-border-radius: 0px;
+	border-radius: 0px;
+    font-size: 30px;
+    height: auto;
+    margin-top: 0;
+    opacity: 1;
+    top: 50%;
+    width: auto;
+}
+#landing .carousel-control.left {
+    left: -17px;
+}
+#landing .carousel-control.right {
+    right: -17px;
+}
+#landing .carousel-control:hover {
+    opacity: 1;
+}
+
+/* Call to Action Headline
+-------------------------------------------------- */
+#headline {
+    padding: 20px 0;
+}
+#headline p {
+    margin: 5px 0;
+}
+
+/* Page Header
+-------------------------------------------------- */
+#header {
+    padding: 30px 0;
+}
+
+/* Main Content
+-------------------------------------------------- */
+#content {
+	padding: 30px 0;
+}
+.icon_wrapper {
+    display: block;
+    height: 50px;
+}
+.icon_wrapper i {
+    font-size: 50px;
+	-webkit-transition: all .2s linear;
+	-moz-transition: all .2s linear;
+	-ms-transition: all .2s linear;
+	-o-transition: all .2s linear;
+	transition: all .2s linear;	
+	display: inline-block;
+	line-height: normal;
+}
+.bouncy:hover i {
+	-moz-transform: translateY(-5px);
+	-webkit-transform: translateY(-5px);
+	-o-transform: translateY(-5px);
+	-ms-transform: translateY(-5px);
+	transform: translateY(-5px);	
+}
+
+/* Callout / Call to Action
+-------------------------------------------------- */
+.callout {
+    margin: 30px 0 0;
+	text-align: center;
+}
+
+/* Pricing Tables
+-------------------------------------------------- */
+.product-plan {
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+}
+ul.plans {
+    margin: 0;
+}
+.product-plan .name {
+	-webkit-border-top-left-radius: 4px;
+	-webkit-border-top-right-radius: 4px;
+	-moz-border-radius-topleft: 4px;
+	-moz-border-radius-topright: 4px;
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+    text-align: center;
+}
+.product-plan .name h3 {
+    display: inline-table;
+    font-size: 30px;
+    padding: 15px 0;
+}
+.product-plan .price {
+    text-align: center;
+}
+.product-plan .price h3 {
+    font-size: 30px;
+    padding: 10px 0;
+}
+.product-plan .price h3 small {
+    vertical-align: bottom;
+}
+.product-plan .feature h4 {
+    padding: 15px;
+}
+.product-plan .action {
+    padding: 20px;
+    text-align: center;
+}
+.product-plan.popular {
+	-webkit-box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.2);
+	-moz-box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.2);
+}
+
+/* Meet the Team
+-------------------------------------------------- */
+#team ul {
+    display: inline-block;
+    position: relative;
+    right: 0;
+    top: 0;
+}
+#team li {
+    float: left;
+    line-height: 20px;
+}
+#team li a {
+    display: block;
+    float: none;
+    font-size: 28px;
+    text-decoration: none;
+}
+#team li a.facebook {
+    color: #3B5998;
+}
+#team li a.twitter {
+    color: #0084B4;
+}
+#team i {
+    width: 1em;
+}
+
+/* Footer
+-------------------------------------------------- */
+#footer {
+    padding: 20px 0;
+}
+#footer h3  {
+    margin-bottom: 5px;
+	text-transform: uppercase;
+}
+#footer ul {
+    list-style: none outside none;
+    margin: 0;
+}
+#footer li {
+    padding: 0 0 5px;
+}
+#footer a {
+	-webkit-transition: all .2s linear;
+	-moz-transition: all .2s linear;
+	-ms-transition: all .2s linear;
+	-o-transition: all .2s linear;
+	transition: all .2s linear;			
+}
+#footer a:hover {
+	padding-left: 5px;	
+	text-decoration: underline;	
+}
+
+/* Copywrite
+-------------------------------------------------- */
+#copywrite p {
+    padding: 10px 0;
+	margin: 0;
+}
+#totop {
+    cursor: pointer;
+}  
+
+/* Mobile Defaults
+------------------------- */
+@media (max-width: 979px) {
+  body {
+    padding-top: 0;
+	overflow-x: hidden;
+  }
+  .navbar .btn-dropnav {
+    display: block;
+  }
+  .navbar .nav-collapse .nav > li > a {
+    display: inline-block;
+  }
+  .navbar .nav-collapse.nav .active > a {
+    margin-left: 5px;
+  } 
+  .navbar .nav-collapse .nav > li.active > a,
+  .navbar .nav-collapse .nav > li.active:hover > a,  
+  .navbar .nav-collapse .nav .active > a,
+  .navbar .nav-collapse .nav .active > a:hover,
+  .navbar .nav-collapse .nav .active > a:focus {
+	border-bottom: medium none;
+	padding: 9px 15px;
+	-moz-transform: translateX(0px);
+	-webkit-transform: translateX(0px);
+	-o-transform: translateX(0px);
+	-ms-transform: translateX(0px);
+	transform: translateX(0px);		
+  }
+  .navbar .nav-collapse .nav > li > a:hover {
+	-moz-transform: translateX(5px);
+	-webkit-transform: translateX(5px);
+	-o-transform: translateX(5px);
+	-ms-transform: translateX(5px);
+	transform: translateX(5px);	
+  }
+  #landing,
+  #header,
+  #content {
+    margin-left: -20px;
+    margin-right: -20px;
+	padding: 30px 20px;
+  }
+  .product-plan .feature .pull-right {
+	float: none;
+  }
+  #headline,
+  #footer {
+    margin-left: -20px;
+    margin-right: -20px;
+	padding: 20px;
+  }
+  #copywrite {
+    margin-left: -20px;
+    margin-right: -20px;
+	padding: 0 20px;
+  }   
+}
+
+/* Tablets to Phones
+------------------------- */
+@media (max-width: 767px) {
+  #landing,
+  #header,
+  #content,
+  #footer {
+	text-align: center;
+  }
+  .modal-flat {
+    left: 0;
+    margin-top: 10px;
+    position: relative;
+    right: 0;
+    top: 0;
+    width: auto;
+  }
+  .product-plan {
+    margin-bottom: 10px;
+  }
+  #footer {
+    display: none;
+  }  
+}
