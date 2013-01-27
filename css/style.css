@@ -1,3 +1,13 @@
 .bs-docs-social-buttons li {
     display: inline-block;
 }
+
+.date {
+    font-size: small;
+    margin: 1em 2em 0 0;
+    float: right;
+}
+
+#posts ol {
+    list-style: none;
+}

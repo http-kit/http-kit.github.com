@@ -1,10 +1,12 @@
 ---
 layout: bounce
-title: client | http-kit
+title: HTTP client
 ---
 <div class="container">
   <h2>Concurrent made easy by asynchronous, promise, callback</h2>
 {% highlight clojure %}
+(:require [org.httpkit.client :as http])
+
 ;; Asynchronous，return a promise, response is ignored
 (http/get "http://host.com/path")
 
