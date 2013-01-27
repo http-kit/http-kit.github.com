@@ -3,7 +3,7 @@ author: feng
 date: '2013-1-27 22-21-00'
 layout: posts
 status: publish
-title: 600k concurrent HTTP connections on PC, with Clojure & http-kit
+title: 600k concurrent HTTP connections, with Clojure & http-kit
 categories: ['http-kit', 'clojure']
 ---
 
