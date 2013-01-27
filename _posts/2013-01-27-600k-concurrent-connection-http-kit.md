@@ -1,6 +1,6 @@
 ---
 author: feng
-date: '2013-1-19 22-21-00'
+date: '2013-1-27 22-21-00'
 layout: posts
 status: publish
 title: 600k concurrent HTTP connections on PC, with Clojure & http-kit
