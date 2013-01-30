@@ -34,7 +34,7 @@ title: HTTP client
               (println "Async HTTP GET: " status))))
   {% endhighlight %}
 
-  <h3> @promise, synchronous reuqest</h3>
+  <h3> @promise, synchronous request</h3>
   {% highlight clojure %}
 ;; Synchronous
 (let [{:keys [status headers body error] :as resp} @(http/get "http://host.com/path")]
