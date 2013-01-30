@@ -10,13 +10,9 @@ title: Home
           {% highlight clojure %}
 [http-kit "2.0-rc1"]
           {% endhighlight %}
-
-          <p>
-            Write from scrach for performance, and for Clojure
-          </p>
-          <p>
-            Concurrent made easy by asynchronous, promise, callback, and Clojure's functional nature
-          </p>
+          <p>Event driven, like Nginx, but for dynamic generate content</p>
+          <p>Written from scrach for Clojure</p>
+          <p>Concurrent made easy by asynchronous, promise, and Clojure's functional nature</p>
 
           <h4>Let's build high performance web app, with Clojure</h4>
           <br />
@@ -28,17 +24,17 @@ title: Home
           </ul>
         </div>
         <div class="span7">
-          <h3>HTTP Server</h3>
+          <h3>HTTP Server <a class="more" href="server.html">more</a></h3>
           {% highlight clojure %}
 (defn async-handler [req]
   (async-response respond
-  ;; respond is a function, can be saved and called on any thread, any time
-                  (future (respond {:status 200
-                                    :headers {"Content-Type" "text/plain"}
-                                    :body  "hello async"}))))
+      ;; respond is a function, can be saved and called on any thread, any time
+      (future (respond {:status 200
+                        :headers {"Content-Type" "text/plain"}
+                        :body  "hello async"}))))
 (run-server async-handler {:port 8000})
           {% endhighlight %}
-          <h3>HTTP Client</h3>
+          <h3>HTTP Client <a class="more" href="client.html">more</a></h3>
           {% highlight clojure %}
 (let [resp1 (http/get "http://http-kit.org/");; request concurrently, return a promise
       resp2 (http/get "http://clojure.org")]
@@ -93,13 +89,13 @@ title: Home
           </p>
         </div>
         <div class="span4 bouncy">
-          <h2>High performance</h2>
+          <h2><a href="https://github.com/ptaoussanis/clojure-web-server-benchmarks">High performance</a></h2>
           <p>
-            http-kit is built for performance. Tens of thousands of requests per second on moderate PC
+            http-kit is built for performance. Tens of thousands of requests per second on moderate PC.
           </p>
         </div>
         <div class="span4 bouncy">
-          <h2>High Concurrency</h2>
+          <h2><a href="600k-concurrent-connection-http-kit.html">High Concurrency</a></h2>
           <p>
             A concurrent connection costs nothing but a few kilobytes of RAM: ~10K high traffic concurrent connections with ~128M heap
           </p>

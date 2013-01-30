@@ -4,38 +4,38 @@ title: HTTP server
 ---
 
 <div class="container">
-  <h2>run-server is a drop in replace of run-jetty</h2>
-
+  <h2>http-kit Server, written from scrach, for Clojure</h2>
 {% highlight clojure %}
 (:use org.httpkit.server)
+{% endhighlight %}
 
+  <h3>`run-server` starts standard Clojure web server</h3>
+  <p>http-kit is written to conform to the standard Clojure web server <a href="https://github.com/ring-clojure/ring">Ring spec</a>. http-kit is a drop-in replacement of ring-jetty-adapter
+  </p>
+
+{% highlight clojure %}
 (defn app [req]
   {:status  200
    :headers {"Content-Type" "text/html"}
    :body    "hello word"})
 
-(run-server app {:port 8080
-                 :thread 4                     ; 4 http worker thread
-                 :queue-size 20480             ; max job queued before reject to project self
-                 :ip "127.0.0.1"               ; bind to localhost
-                 :worker-name-prefix "worker-" ; thread name worker-1, worker-2, worker-3, ......
-                 :max-line 4096                ; max http header line length
-                 :max-body 1048576})           ; max http request body, 1M
+(run-server app {:port 8080})
 {% endhighlight %}
 
-  <h2>Websocket</h2>
+  <h3>websocket support</h3>
+  <p>A realtime chart example: <a href="https://github.com/http-kit/chat-websocket">https://github.com/http-kit/chat-websocket</a></p>
 {% highlight clojure %}
 
 (defn chat-handler [req]
-  (if-ws-request req con
-                 (on-mesg con (fn [msg]
-                                ;; echo back
-                                (send-mesg con msg)))))
+  (when-ws-request req con
+     (on-mesg con (fn [msg] (send-mesg con msg))) ;; echo back
+     (on-close con (fn [status] (println "closed")))))
 
 (run-server chat-handler {:port 8080})
 {% endhighlight %}
 
-  <h2>Asynchronous (Long polling)</h2>
+  <h3>asynchronous (long polling)</h3>
+  <p>A realtime chart example: <a href="https://github.com/http-kit/chat-polling">https://github.com/http-kit/chat-polling</a></p>
 
 {% highlight clojure %}
 
