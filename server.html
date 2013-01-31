@@ -4,14 +4,23 @@ title: HTTP server
 ---
 
 <div class="container">
-  <h2>http-kit Server, written from scrach, for Clojure</h2>
+  <h2>HTTP server, with async and websocket support</h2>
 {% highlight clojure %}
 (:use org.httpkit.server)
 {% endhighlight %}
 
   <h3>`run-server` starts standard Clojure web server</h3>
-  <p>http-kit is written to conform to the standard Clojure web server <a href="https://github.com/ring-clojure/ring">Ring spec</a>. http-kit is a drop-in replacement of ring-jetty-adapter
-  </p>
+  <p>http-kit is written to conform to the standard Clojure web server <a href="https://github.com/ring-clojure/ring">Ring spec</a>, is a drop-in replacement of ring-jetty-adapter</p>
+  <h5>Options:</h5>
+  <ul>
+    <li><code>:ip</code>: which IP to bind, default to <code>0.0.0.0</code></li>
+    <li><code>:port</code>: which port listens incomming request, default to 8090</li>
+    <li><code>:thread</code>: How many threads to compute response from request, default to 4</li>
+    <li><code>:worker-name-prefix</code>: woker thread name prefix, default to <code>worker-</code>: <code>worker-1</code> <code>worker-2</code>....</li>
+    <li><code>:queue-size</code>: max requests queued waiting for threadpool to compute response before reject, 503 will be returned to client if queue is full, default to 20k, </li>
+    <li><code>:max-body</code>: length limit for http body in bytes, 413 will be returned if exceeds the limit, default to 8388608(8M)</li>
+    <li><code>:max-line</code>: length limit for inital line and per header, 414 will be returned if exceeds the limit, default to 4096(4k)</li>
+  </ul>
 
 {% highlight clojure %}
 (defn app [req]
@@ -24,17 +33,31 @@ title: HTTP server
 
   <h3>websocket support</h3>
   <p>A realtime chart example: <a href="https://github.com/http-kit/chat-websocket">https://github.com/http-kit/chat-websocket</a></p>
+  <ul>
+    <li>
+      <code>if-ws-request</code> or <code>when-ws-request</code>: get the websocket connection, returns websocket handshake
+    </li>
+    <li><code>on-mesg</code>: register a fn to be called when there is message from client</li>
+    <li><code>send-mesg</code>: send message to client</li>
+    <li><code>close-conn</code>: close the websocket connection</li>
+    <li><code>on-close</code>: register a fn to be called when the connecton is closed</li>
+  </ul>
 {% highlight clojure %}
 
 (defn chat-handler [req]
-  (when-ws-request req con
-     (on-mesg con (fn [msg] (send-mesg con msg))) ;; echo back
-     (on-close con (fn [status] (println "closed")))))
+  (when-ws-request req ws-con  ; ws-con bind to the websocket connection
+     (on-mesg ws-con (fn [msg]
+                         (send-mesg ws-con msg) ;; echo back
+                         (close-conn ws-con)))
+     (on-close ws-con (fn [status] (println ws-con "closed")))))
 
 (run-server chat-handler {:port 8080})
 {% endhighlight %}
 
   <h3>asynchronous (long polling)</h3>
+  <p>All request-level middlewares applied to <code>req</code> before passing to <code>aync-handler</code> (like any other handler)</p>
+  <p><code>respond</code> accept a standard ring-response (:status :headers :body) or just the :body</p>
+  <p>The response is sent to client without response-level middlewares applied (a limitation, suggestions welcome)</p>
   <p>A realtime chart example: <a href="https://github.com/http-kit/chat-polling">https://github.com/http-kit/chat-polling</a></p>
 
 {% highlight clojure %}
@@ -42,6 +65,7 @@ title: HTTP server
 (defn async-handler [req]
   ; respond is a function, can be called on any thread to send the response to client
   (async-response respond
+                  ; just :body, can also be {:status _ :headers _ :body _}
                   (future (respond "hello world async"))))
 
 (run-server async-handler {:port 8080})

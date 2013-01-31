@@ -15,3 +15,7 @@
 .more {
     font-size: 12px;
 }
+
+li {
+    padding: 3px 0;
+}

@@ -12,12 +12,12 @@ title: HTTP client
   </p>
   <ul>
     <li>Concurrent made easy by asynchronous and promise</li>
-    <li>Keep-alived, for better performance</li>
+    <li>Keep-alived, quite a difference in performance</li>
     <li>Timeout per request</li>
     <li>API modeled after <a href="https://github.com/dakrone/clj-http">clj-http</a></li>
   </ul>
 
-  <h3>asynchronous request, you get the promise</h3>
+  <h3>asynchronous request, get the promise</h3>
   {% highlight clojure %}
 (http/get "http://host.com/path") ; the promise is ignored, fire and forget
 
@@ -49,7 +49,7 @@ title: HTTP client
     (println "Async HTTP POST: " status)))
   {% endhighlight %}
 
-  <h3>concurrent requests，handle responses in a familar style</h3>
+  <h3>concurrent requests. handle responses in a familar style</h3>
   <p>request concurrently, half the waiting time</p>
 
 {% highlight clojure %}
