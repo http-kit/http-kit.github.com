@@ -6,16 +6,16 @@ title: Home
   <div class="container">
     <div class="row">
         <div class="span5">
-          <h1>HTTP Server & Client, async and websocket supported</h1>
+          <h1>HTTP Client/Server for Clojure</h1>
+          <p>HTTP Kit is a <strong>small</strong>, <strong>efficient</strong>,
+            <strong>Ring-compatible</strong> HTTP client/server for Clojure. It
+            uses a simple <strong>event-driven</strong> architecture to support
+            <strong>highly concurrent a/synchronous</strong> web applications
+            (including <strong>WebSocket</strong> applications).</p>
           {% highlight clojure %}
-[http-kit "2.0-rc1"]
-          {% endhighlight %}
-          <p>Event driven, like Nginx, but for generating dynamic content</p>
-          <p>Written from scrach for Clojure, with server side use in mind</p>
-          <p>Concurrent made easy by asynchronous, promise, and Clojure's functional nature</p>
-          <h4>Let's build high performance web app, with Clojure</h4>
+[http-kit "2.0.0-RC1"] ; Add to your project.clj{% endhighlight %}
           <br />
-          <h5>Recent blogs</h5>
+          <h3>Recent Blog Posts</h3>
           <ul>
             {% for post in site.posts %}
             <li><a href="{{ post.url }}">{{ post.title }}</a></li>
@@ -23,24 +23,24 @@ title: Home
           </ul>
         </div>
         <div class="span7">
-          <h3>HTTP Server <a class="more" href="server.html">more</a></h3>
+          <h3>HTTP Server <a class="more" href="server.html">documentation</a></h3>
           {% highlight clojure %}
-(defn async-handler [req]
-  (async-response respond
-      ;; respond is a function, can be saved and called on any thread, any time
-      (future (respond {:status 200
-                        :headers {"Content-Type" "text/plain"}
-                        :body  "hello async"}))))
-(run-server async-handler {:port 8000})
-          {% endhighlight %}
-          <h3>HTTP Client <a class="more" href="client.html">more</a></h3>
+(defn my-async-handler [ring-request]
+  (http-kit/async-response my-callback ; Use this callback when ready
+    (future ; Respond from any thread!
+      (my-callback {:status 200
+                    :headers {"Content-Type" "text/plain"}
+                    :body    "This response was delivered asynchronously!"}))))
+
+(http-kit/run-server my-async-handler {:port 8080}) ; Ring server{% endhighlight %}
+          <h3>HTTP Client <a class="more" href="client.html">documentation</a></h3>
           {% highlight clojure %}
-(let [resp1 (http/get "http://http-kit.org/");; request concurrently, return a promise
-      resp2 (http/get "http://clojure.org")]
-  ;; handle one by one, wait as necessary
-  (println "resp1's status: " (:status @resp1))
-  (println "resp2's status: " (:status @resp2)))
-          {% endhighlight %}
+(let [;; Start concurrent requests, return promises:
+      ring-response1 (http-kit/get "http://http-kit.org/")
+      ring-response2 (http-kit/get "http://clojure.org/")]
+  ;; Handle responses one-by-one, blocking as necessary:
+  (println "response1's status: " (:status @ring-response1))
+  (println "response2's status: " (:status @ring-response2))){% endhighlight %}
         </div>
     </div>
   </div>
@@ -51,10 +51,68 @@ title: Home
     <div class="row">
       <div class="row">
         <div class="span4 bouncy">
+          <h2>Ring Compliant</h2>
+          <p>
+            HTTP Kit is an <a href="migration.html">(almost)</a> drop-in
+            replacement for the standard Ring Jetty adapter. So you can use it
+            with all your current libraries
+            (e.g. <a href="https://github.com/weavejester/compojure">Compojure</a>)
+            and middleware.
+          </p>
+        </div>
+        <div class="span4 bouncy">
+          <h2>High Performance</h2>
+          <p>
+            Using an event-driven architecture like Nginx, HTTP-kit
+            is <a href="https://github.com/ptaoussanis/clojure-web-server-benchmarks">
+              very, very fast</a>. It comfortably handles tens of thousands of
+            requests/sec on even midrange hardware.
+          </p>
+        </div>
+        <div class="span4 bouncy">
+          <h2>High Concurrency</h2>
+          <p>
+            It's not only fast,
+            but <a href="600k-concurrent-connection-http-kit.html">efficient</a>!
+            Each connection uses only a few kB of memory. Handles ~10k
+            high-traffic concurrent clients with a ~128MB heap.
+          </p>
+        </div>
+
+        <div class="span4 bouncy">
+          <h2>Clean, Simple, Small</h2>
+          <p>
+            Written from the ground-up to be lean, the entire client/server is
+            available as a single ~80kB JAR with zero dependencies and ~3k
+            lines of (mostly Java) code.
+          </p>
+        </div>
+        <div class="span4 bouncy">
+          <h2>Sync or Async</h2>
+          <p>
+            Synchronous is simple. Asynchronous is fast &amp; flexible. With
+            HTTP Kit you get the best of both with a simple API that let's you
+            mix &amp; match to best fit your use case.
+          </p>
+        </div>
+        <div class="span4 bouncy">
+          <h2>WebSockets and Comet</h2>
+          <p>
+            With great out-the-box support for both WebSockets and efficient
+            handling of long-held HTTP requests, realtime web applications are a
+            breeze to write.
+          </p>
+        </div>
+
+        <div class="span4 offset4 bouncy">
           <h2>Open Source</h2>
           <p>
-            Apache License, Version 2.0. Source code on <a href="https://github.com/http-kit/http-kit">github</a>.
-            Want to make it better? Contributing is just a pull request away!
+            HTTP Kit is
+            on <a href="https://github.com/http-kit/http-kit">GitHub</a> and is
+            distributed under
+            the <a href="http://www.apache.org/licenses/LICENSE-2.0.html">Version
+            2.0 Apache License</a>. Want to make it better? Contributing is just
+            a pull request away!
           </p>
           <ul class="bs-docs-social-buttons">
             <li>
@@ -65,40 +123,7 @@ title: Home
             </li>
           </ul>
         </div>
-        <div class="span4 bouncy">
-          <h2>Efficient Comet</h2>
-          <p>
-            Efficient long-held HTTP request, push data to browser, exiting standard, works everywhere. Realtime server push made easier.
-          </p>
-        </div>
-        <div class="span4 bouncy">
-          <h2>Websocket</h2>
-          <p>
-            Realtime web applications target modern browsers! The API is simple, easy to use, easy to understand.
-          </p>
-        </div>
-
-      </div>
-      <hr class="dashed">
-      <div class="row">
-        <div class="span4 bouncy">
-          <h2>All-in-one Library</h2>
-          <p>
-            HTTP client/server in one library, a single ~80k jar file. Zero dependency, write from scrach in just ~3000 lines of code. Less is exponentially more!
-          </p>
-        </div>
-        <div class="span4 bouncy">
-          <h2><a href="https://github.com/ptaoussanis/clojure-web-server-benchmarks">High performance</a></h2>
-          <p>
-            http-kit is built for performance. Tens of thousands of requests per second on moderate PC.
-          </p>
-        </div>
-        <div class="span4 bouncy">
-          <h2><a href="600k-concurrent-connection-http-kit.html">High Concurrency</a></h2>
-          <p>
-            A concurrent connection costs nothing but a few kilobytes of RAM: ~10K high traffic concurrent connections with ~128M heap
-          </p>
-        </div>
+        <div class="span4 bounch"></div>
       </div>
     </div>
   </div>
