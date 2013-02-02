@@ -19,19 +19,20 @@ title: HTTP client
 
   <h3>asynchronous request, get the promise</h3>
   {% highlight clojure %}
-(http/get "http://host.com/path") ; the promise is ignored, fire and forget
+;fire and forget, returns immediately[1], returned promise is ignored
+(http/get "http://host.com/path")
 
 (def options {:timeout 200             ; ms
               :basic-auth ["user" "pass"]
-              :query-params {:param "value"}
+              :query-params {:param "value" :param2 ["value1" "value2"]}
               :user-agent "User-Agent-string"
               :headers {"X-Header" "Value"}})
 (http/get "http://host.com/path" options
-          ;; asynchronous handle response
-          (fn [{:keys [status headers body error]}]
+          (fn [{:keys [status headers body error]}] ;; asynchronous handle response
             (if error
               (println "Failed, exception is " error)
               (println "Async HTTP GET: " status))))
+ ; [1] may not always true, since DNS lookup maybe slow
   {% endhighlight %}
 
   <h3> @promise, synchronous request</h3>
@@ -49,12 +50,12 @@ title: HTTP client
     (println "Async HTTP POST: " status)))
   {% endhighlight %}
 
-  <h3>concurrent requests. handle responses in a familar style</h3>
-  <p>request concurrently, half the waiting time</p>
+  <h3>combined, concurrent requests, handle results synchronously</h3>
+  <p>Sent request concurrently, half the waiting time</p>
 
 {% highlight clojure %}
-(let [resp1 (http/get "http://host.com/path1")
-      resp2 (http/get "http://host.com/path2")]
+(let [resp1 (http/get "http://http-kit.org/")
+      resp2 (http/get "http://clojure.org/")]
   (println "Response 1's status " {:status @resp1}) ; wait as necessary
   (println "Response 2's status " {:status @resp2}))
 {% endhighlight %}

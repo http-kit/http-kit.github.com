@@ -9,17 +9,21 @@ title: HTTP server
 (:use org.httpkit.server)
 {% endhighlight %}
 
-  <h3>`run-server` starts standard Clojure web server</h3>
-  <p>http-kit is written to conform to the standard Clojure web server <a href="https://github.com/ring-clojure/ring">Ring spec</a>, is a drop-in replacement of ring-jetty-adapter</p>
+  <h3 id="options"><code>run-server</code> starts standard Clojure web server</h3>
+  <p>http-kit is written to conform to the standard Clojure web server
+    <a href="https://github.com/ring-clojure/ring">Ring spec</a>,
+    (<a href="migration.html">almost</a>) drop-in replacement of ring-jetty-adapter</p>
   <h5>Options:</h5>
   <ul>
     <li><code>:ip</code>: which IP to bind, default to <code>0.0.0.0</code></li>
     <li><code>:port</code>: which port listens incomming request, default to 8090</li>
     <li><code>:thread</code>: How many threads to compute response from request, default to 4</li>
     <li><code>:worker-name-prefix</code>: woker thread name prefix, default to <code>worker-</code>: <code>worker-1</code> <code>worker-2</code>....</li>
-    <li><code>:queue-size</code>: max requests queued waiting for threadpool to compute response before reject, 503 will be returned to client if queue is full, default to 20k, </li>
-    <li><code>:max-body</code>: length limit for http body in bytes, 413 will be returned if exceeds the limit, default to 8388608(8M)</li>
-    <li><code>:max-line</code>: length limit for inital line and per header, 414 will be returned if exceeds the limit, default to 4096(4k)</li>
+    <li><code>:queue-size</code>: max requests queued waiting for threadpool to compute response before reject, 503(Service Unavailable) is returned to client if queue is full, default to 20K</li>
+    <li><code>:max-body</code>: length limit for request body in bytes, 413(Request Entity Too Large) is returned if exceeds this limit, default to 8388608(8M)</li>
+    <li><code>:max-line</code>: length limit for HTTP inital line and per header,
+      414(Request-URI Too Long) will be returned if exceeds this limit, default to 4096(4K),
+      <a href="http://stackoverflow.com/questions/417142/what-is-the-maximum-length-of-a-url">relevant discusstion on stackoverflow</a></li>
   </ul>
 
 {% highlight clojure %}
@@ -72,4 +76,27 @@ title: HTTP server
 
 {% endhighlight %}
 
+  <h3>Recommended server deployment</h3>
+  <p>http-kit runs alone happly, handy for development and quick deployment.
+    Use reverse proxy like <a href="http://wiki.nginx.org/Main">Nginx</a>,
+    <a href="http://www.lighttpd.net/">Lighthttpd</a>, etc in serious production is encouraged: </p>
+  <ul>
+    <li>They are fast</li>
+    <li>They are heavily optimized for static content.</li>
+    <li>They can be configured to compress the content sent to browsers</li>
+  </ul>
+  <p>Sample Nginx configration:</p>
+  {% highlight sh %}
+server {
+    location /static/ {  # static connent
+        alias   /var/www/xxxx/public/;
+    }
+    location / {
+        proxy_pass  http://127.0.0.1:8090/; # http-kit listen on 8090
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        access_log  /var/log/nginx/xxxx.access.log;
+    }
+}
+  {% endhighlight %}
 </div>

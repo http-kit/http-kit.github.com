@@ -4,5 +4,49 @@ title: Migration from Jetty
 ---
 
 <div class="container">
-  <h2>TODO</h2>
+  <h2>Migrate from Ring Jetty adapter</h2>
+  <p>
+    HTTP Kit is an almost drop-in
+    replacement for the standard Ring Jetty adapter,
+    just replace <code>run-jetty</code> with <code>run-server</code>.
+  </p>
+  <p>Few differences:</p>
+
+  <h3>Stop server programmatically</h3>
+  {% highlight clojure %}
+(let [jetty (run-jetty app options)]
+  (.stop jetty))
+
+(let [server (run-server app options)]
+  ;; run-server a function, call it to stop the server
+  (server))
+  {% endhighlight %}
+  <h3>The keys http-kit pick from <code>options</code></h3>
+  <p>
+    <code>:join?</code> default to false and not configurable: <code>run-server</code> returns after server started
+  </p>
+  <p><a href="server.html#options">List of keys http-kit will pick</a></p>
+  <h3>SSL is not supported</h3>
+  <p>Non-blocing socket IO with SSL is quite hard to get right</p>
+  <p>http-kit focuses on the providing a fast, simple HTTP server for Clojure applications</p>
+  <p>SSL is well supported by <a href="http://wiki.nginx.org/HttpSslModule">Nginx</a>,
+    <a href="http://redmine.lighttpd.net/projects/1/wiki/Docs_SSL">Lighthttpd</a>, etc, configure them is well documented and easy,
+    sample configration for Nginx: </p>
+
+  {% highlight sh %}
+server {
+    listen 443 ssl;
+
+    ssl on;
+    ssl_certificate /etc/nginx/ssl/xxxxx_ssl.crt;
+    ssl_certificate_key /etc/nginx/ssl/xxxx_ssl.key.nopasswd;
+
+     location / {
+        # http-kit listens on port 9090
+        proxy_pass  http://127.0.0.1:9090/;
+        proxy_set_header Host $http_host;
+    }
+}
+  {% endhighlight %}
+  </p>
 </div>
