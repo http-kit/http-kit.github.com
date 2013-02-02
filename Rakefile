@@ -32,7 +32,7 @@ end
 
 desc "Watch for change"
 task :watch => :generate do
-    sh "http-watcher -ignores _site -command ./preprocess"
+    sh "http-watcher -port 8081 -ignores _site -command ./preprocess"
 end
 
 desc "Compress html"

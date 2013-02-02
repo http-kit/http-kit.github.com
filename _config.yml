@@ -1,5 +1,6 @@
 safe: true
 lsi: false
+url: http://http-kit.org
 markdown: kramdown
 pygments: true
 permalink: /:title.html
