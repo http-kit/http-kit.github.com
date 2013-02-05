@@ -18,20 +18,14 @@ title: Migration from Jetty
   (.stop jetty))
 
 (let [server (run-server app options)]
-  ;; run-server a function, call it to stop the server
+  ;; run-server return a function that stops the server
   (server))
   {% endhighlight %}
-  <h3>The keys http-kit pick from <code>options</code></h3>
+  <h3>Configuring HTTPS</h3>
   <p>
-    <code>:join?</code> default to false and not configurable: <code>run-server</code> returns after server started
+    http-kit relies reverse proxy (like <a href="http://wiki.nginx.org/HttpSslModule">Nginx</a>, <a href="http://redmine.lighttpd.net/projects/1/wiki/Docs_SSL">Lighthttpd</a>) to support HTTPS.
   </p>
-  <p><a href="server.html#options">List of keys http-kit will pick</a></p>
-  <h3>SSL is not supported</h3>
-  <p>Non-blocing socket IO with SSL is quite hard to get right</p>
-  <p>http-kit focuses on the providing a fast, simple HTTP server for Clojure applications</p>
-  <p>SSL is well supported by <a href="http://wiki.nginx.org/HttpSslModule">Nginx</a>,
-    <a href="http://redmine.lighttpd.net/projects/1/wiki/Docs_SSL">Lighthttpd</a>, etc, configure them is well documented and easy,
-    sample configration for Nginx: </p>
+  <p>Sample configration for Nginx: </p>
 
   {% highlight sh %}
 server {

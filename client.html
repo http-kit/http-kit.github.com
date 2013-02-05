@@ -8,13 +8,13 @@ title: HTTP client
 (:require [org.httpkit.client :as http])
   {% endhighlight %}
   <p>
-    The HTTP client is written from scratch to take advantage of event driven socket IO.
+    Like the Server, the client uses an event-driven, non-blocking I/O model. It's lightweight and efficient.
   </p>
   <ul>
     <li>Concurrent made easy by asynchronous and promise</li>
     <li>Keep-alived, quite a difference in performance</li>
     <li>Timeout per request</li>
-    <li>API modeled after <a href="https://github.com/dakrone/clj-http">clj-http</a></li>
+    <li>Easy to use API, modeled after <a href="https://github.com/dakrone/clj-http">clj-http</a></li>
   </ul>
 
   <h3>asynchronous request, get the promise</h3>
@@ -37,7 +37,7 @@ title: HTTP client
 
   <h3> @promise, synchronous request</h3>
   {% highlight clojure %}
-;; Synchronous
+;; synchronous
 (let [{:keys [status headers body error] :as resp} @(http/get "http://host.com/path")]
   (if error
     (println "Failed, exception: " error)

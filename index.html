@@ -9,7 +9,7 @@ title: Home
           <h1>HTTP Client/Server for Clojure</h1>
           <p>HTTP Kit is a <strong>small</strong>, <strong>efficient</strong>,
             <strong>Ring-compatible</strong> HTTP client/server for Clojure. It
-            uses a simple <strong>event-driven</strong> architecture to support
+            uses a <strong>event-driven</strong> architecture to support
             <strong>highly concurrent a/synchronous</strong> web applications
             (including <strong>WebSocket</strong> applications).</p>
           {% highlight clojure %}
@@ -26,21 +26,22 @@ title: Home
           <h3>HTTP Server <a class="more" href="server.html">documentation</a></h3>
           {% highlight clojure %}
 (defn my-async-handler [ring-request]
-  (http-kit/async-response my-callback ; Use this callback when ready
+  (async-response respond ; Use this callback when ready
     (future ; Respond from any thread!
-      (my-callback {:status 200
-                    :headers {"Content-Type" "text/plain"}
-                    :body    "This response was delivered asynchronously!"}))))
+      (respond {:status 200
+                :headers {"Content-Type" "text/plain"}
+                :body    "This response was delivered asynchronously!"}))))
 
-(http-kit/run-server my-async-handler {:port 8080}) ; Ring server{% endhighlight %}
+(run-server my-async-handler {:port 8080}) ; Ring server{% endhighlight %}
           <h3>HTTP Client <a class="more" href="client.html">documentation</a></h3>
           {% highlight clojure %}
-(let [;; Start concurrent requests, return promises:
-      ring-response1 (http-kit/get "http://http-kit.org/")
-      ring-response2 (http-kit/get "http://clojure.org/")]
-  ;; Handle responses one-by-one, blocking as necessary:
-  (println "response1's status: " (:status @ring-response1))
-  (println "response2's status: " (:status @ring-response2))){% endhighlight %}
+;; Start concurrent requests, return promises:
+(let [response1 (http-kit/get "http://http-kit.org/")
+      response2 (http-kit/get "http://clojure.org/")]
+  ;; Handle responses one-by-one, blocking as necessary
+  ;; Other keys :headers :body :error :opts
+  (println "response1's status: " (:status @response1))
+  (println "response2's status: " (:status @response2))){% endhighlight %}
         </div>
     </div>
   </div>
@@ -83,8 +84,8 @@ title: Home
         <h2>Clean, Simple, Small</h2>
         <p>
           Written from the ground-up to be lean, the entire client/server is
-          available as a single ~80kB JAR with zero dependencies and ~3k
-          lines of (mostly Java) code.
+          available as a single ~80kB JAR with zero dependencies and
+          <a href="http-kit-clean-small.html">~3k lines of (mostly Java) code</a>.
         </p>
       </div>
       <div class="span4 bouncy">

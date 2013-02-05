@@ -4,15 +4,26 @@ title: HTTP server
 ---
 
 <div class="container">
-  <h2>HTTP server, with async and websocket support</h2>
+  <h2>HTTP server, ring adapter, with async and websocket extenstion</h2>
 {% highlight clojure %}
 (:use org.httpkit.server)
 {% endhighlight %}
+  <p>The server uses an event-driven, non-blocking I/O model that makes it lightweight and scalable.
+    It's written to conform to the standard Clojure web server
+    <a href="https://github.com/ring-clojure/ring">Ring spec</a>, with asynchronous and websocket extenstion.
+    HTTP Kit is (<a href="migration.html">almost</a>) drop-in replacement of ring-jetty-adapter
+  </p>
 
-  <h3 id="options"><code>run-server</code> starts standard Clojure web server</h3>
-  <p>http-kit is written to conform to the standard Clojure web server
-    <a href="https://github.com/ring-clojure/ring">Ring spec</a>,
-    (<a href="migration.html">almost</a>) drop-in replacement of ring-jetty-adapter</p>
+  <h3 id="options">run-server starts standard Clojure web server</h3>
+
+{% highlight clojure %}
+(defn app [req]
+  {:status  200
+   :headers {"Content-Type" "text/html"}
+   :body    "hello word"})
+; you may want to use compojure for routing: https://github.com/weavejester/compojure
+(run-server app {:port 8080})
+{% endhighlight %}
   <h5>Options:</h5>
   <ul>
     <li><code>:ip</code>: which IP to bind, default to <code>0.0.0.0</code></li>
@@ -26,16 +37,7 @@ title: HTTP server
       <a href="http://stackoverflow.com/questions/417142/what-is-the-maximum-length-of-a-url">relevant discusstion on stackoverflow</a></li>
   </ul>
 
-{% highlight clojure %}
-(defn app [req]
-  {:status  200
-   :headers {"Content-Type" "text/html"}
-   :body    "hello word"})
-
-(run-server app {:port 8080})
-{% endhighlight %}
-
-  <h3>websocket support</h3>
+  <h3>websocket extenstion</h3>
   <p>A realtime chart example: <a href="https://github.com/http-kit/chat-websocket">https://github.com/http-kit/chat-websocket</a></p>
   <ul>
     <li>
@@ -52,20 +54,19 @@ title: HTTP server
   (when-ws-request req ws-con  ; ws-con bind to the websocket connection
      (on-mesg ws-con (fn [msg]
                          (send-mesg ws-con msg) ;; echo back
-                         (close-conn ws-con)))
+                         (close-conn ws-con)))  ;; close the connection
      (on-close ws-con (fn [status] (println ws-con "closed")))))
 
 (run-server chat-handler {:port 8080})
 {% endhighlight %}
 
-  <h3>asynchronous (long polling)</h3>
+  <h3>asynchronous (long polling) extenstion</h3>
   <p>All request-level middlewares applied to <code>req</code> before passing to <code>aync-handler</code> (like any other handler)</p>
   <p><code>respond</code> accept a standard ring-response (:status :headers :body) or just the :body</p>
-  <p>The response is sent to client without response-level middlewares applied (a limitation, suggestions welcome)</p>
+  <p><b class="message">The response is sent to client without response-level middlewares applied (a limitation, suggestions welcome)</b> </p>
   <p>A realtime chart example: <a href="https://github.com/http-kit/chat-polling">https://github.com/http-kit/chat-polling</a></p>
 
 {% highlight clojure %}
-
 (defn async-handler [req]
   ; respond is a function, can be called on any thread to send the response to client
   (async-response respond
@@ -73,8 +74,45 @@ title: HTTP server
                   (future (respond "hello world async"))))
 
 (run-server async-handler {:port 8080})
-
 {% endhighlight %}
+
+  <h3 id="timer">Timer facility</h3>
+  <p>An general purpose, efficient timer is provided. </p>
+
+  <p>
+    <code>schedule-task</code>: schedules body for invocation after given time and returns a
+    CancelableFutureTask. <code>(cancel task)</code> will cancel the task if possible and
+    return true iff cancellation was successful.
+  </p>
+
+  {% highlight clojure %}
+(:require [org.httpkit.timer :as timer])
+
+(let [task (timer/schedule-task 1000
+              (println "This will print in 1000ms if not canceled"))]
+  (Thread/sleep (rand-nth [1100 900]))
+  (when (timer/cancel task)
+    (println "Task was cancelled")
+    (println "Task already executed"))){% endhighlight %}
+
+  <p>
+    <code>with-timeout</code>: schedules timeout-form for invocation after given timeout and wraps named
+    fn so that calling it with any arguments also cancels the timeout if possible.
+    If the timeout has already been invoked, the fn will not run and will
+    immediately return nil
+  </p>
+  {% highlight clojure %}
+(with-timeout println 800 (println "Timeout task triggered")
+   (Thread/sleep (rand-nth [900 700]))
+   (println "Timeout task was cancelled"))
+
+(async-response respond ;; together with async-response
+  (with-timeout respond 1000
+    (respond {:status 200 :body "service did not return in 1000ms"})
+    (let [result (call-a-long-running-service)]
+      ;; respond will not diliver the response if the service take more than 1000ms
+      (respond {:status 200 :body result}))))
+  {% endhighlight %}
 
   <h3>Recommended server deployment</h3>
   <p>http-kit runs alone happly, handy for development and quick deployment.
