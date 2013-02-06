@@ -38,7 +38,6 @@ title: HTTP server
   </ul>
 
   <h3>websocket extenstion</h3>
-  <p>A realtime chart example: <a href="https://github.com/http-kit/chat-websocket">https://github.com/http-kit/chat-websocket</a></p>
   <ul>
     <li>
       <code>if-ws-request</code> or <code>when-ws-request</code>: get the websocket connection, returns websocket handshake
@@ -48,7 +47,10 @@ title: HTTP server
     <li><code>close-conn</code>: close the websocket connection</li>
     <li><code>on-close</code>: register a fn to be called when the connecton is closed</li>
   </ul>
-{% highlight clojure %}
+  <p>For WebSocket Secure connection, one option is <a href="https://github.com/bumptech/stud">stud</a> (self-signed certificate may not work with websocket)</p>
+  <p>A realtime chart example: <a href="https://github.com/http-kit/chat-websocket">https://github.com/http-kit/chat-websocket</a></p>
+
+  {% highlight clojure %}
 
 (defn chat-handler [req]
   (when-ws-request req ws-con  ; ws-con bind to the websocket connection
@@ -68,7 +70,7 @@ title: HTTP server
 
 {% highlight clojure %}
 (defn async-handler [req]
-  ; respond is a function, can be called on any thread to send the response to client
+  ; respond is a one-time function, can be called on any thread to send the response to client
   (async-response respond
                   ; just :body, can also be {:status _ :headers _ :body _}
                   (future (respond "hello world async"))))
@@ -77,7 +79,7 @@ title: HTTP server
 {% endhighlight %}
 
   <h3 id="timer">Timer facility</h3>
-  <p>An general purpose, efficient timer is provided. </p>
+  <p>A general purpose, efficient timer is provided. </p>
 
   <p>
     <code>schedule-task</code>: schedules body for invocation after given time and returns a
@@ -91,7 +93,7 @@ title: HTTP server
 (let [task (timer/schedule-task 1000
               (println "This will print in 1000ms if not canceled"))]
   (Thread/sleep (rand-nth [1100 900]))
-  (when (timer/cancel task)
+  (if (timer/cancel task)
     (println "Task was cancelled")
     (println "Task already executed"))){% endhighlight %}
 
@@ -110,7 +112,9 @@ title: HTTP server
   (with-timeout respond 1000
     (respond {:status 200 :body "service did not return in 1000ms"})
     (let [result (call-a-long-running-service)]
-      ;; respond will not diliver the response if the service take more than 1000ms
+      ;; Call `respond` cancels the timeout if possible.
+      ;; If the timeout has already been invoked (the service takes more than 1000ms to return),
+      ;; `respond` will not run and return nil immediately.
       (respond {:status 200 :body result}))))
   {% endhighlight %}
 
