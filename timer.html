@@ -1,0 +1,49 @@
+---
+layout: bounce
+title: HTTP server
+---
+<div class="container">
+
+  <h2 id="timer">Timer facility</h2>
+  {% highlight clojure %}
+(:require [org.httpkit.timer :as timer])
+  {% endhighlight %}
+
+  <p>A general purpose, efficient timer is provided. </p>
+  <h3>schedule-task</h3>
+  <p>
+    schedules body for invocation after given time and returns a
+    CancelableFutureTask. <code>(cancel task)</code> will cancel the task if possible and
+    return true iff cancellation was successful.
+  </p>
+
+  {% highlight clojure %}
+(let [task (timer/schedule-task 1000
+              (println "This will print in 1000ms if not canceled"))]
+  (Thread/sleep (rand-nth [1100 900]))
+  (if (timer/cancel task)
+    (println "Task was cancelled")
+    (println "Task already executed"))){% endhighlight %}
+  <h3>with-timeout</h3>
+  <p>
+    schedules timeout-form for invocation after given timeout and wraps named
+    fn so that calling it with any arguments also cancels the timeout if possible.
+    If the timeout has already been invoked, the fn will not run and will
+    immediately return nil
+  </p>
+  {% highlight clojure %}
+(with-timeout println 800 (println "Timeout task triggered")
+   (Thread/sleep (rand-nth [900 700]))
+   (println "Timeout task was cancelled"))
+
+(async-response respond ;; together with async-response
+  (with-timeout respond 1000
+    (respond {:status 200 :body "service did not return in 1000ms"})
+    (let [result (call-a-long-running-service)]
+      ;; Call `respond` cancels the timeout if possible.
+      ;; If the timeout has already been invoked (the service takes more than 1000ms to return),
+      ;; `respond` will not run and return nil immediately.
+      (respond {:status 200 :body result}))))
+  {% endhighlight %}
+
+</div>

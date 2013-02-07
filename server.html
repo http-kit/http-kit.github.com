@@ -78,65 +78,36 @@ title: HTTP server
 (run-server async-handler {:port 8080})
 {% endhighlight %}
 
-  <h3 id="timer">Timer facility</h3>
-  <p>A general purpose, efficient timer is provided. </p>
-
-  <p>
-    <code>schedule-task</code>: schedules body for invocation after given time and returns a
-    CancelableFutureTask. <code>(cancel task)</code> will cancel the task if possible and
-    return true iff cancellation was successful.
-  </p>
-
-  {% highlight clojure %}
-(:require [org.httpkit.timer :as timer])
-
-(let [task (timer/schedule-task 1000
-              (println "This will print in 1000ms if not canceled"))]
-  (Thread/sleep (rand-nth [1100 900]))
-  (if (timer/cancel task)
-    (println "Task was cancelled")
-    (println "Task already executed"))){% endhighlight %}
-
-  <p>
-    <code>with-timeout</code>: schedules timeout-form for invocation after given timeout and wraps named
-    fn so that calling it with any arguments also cancels the timeout if possible.
-    If the timeout has already been invoked, the fn will not run and will
-    immediately return nil
-  </p>
-  {% highlight clojure %}
-(with-timeout println 800 (println "Timeout task triggered")
-   (Thread/sleep (rand-nth [900 700]))
-   (println "Timeout task was cancelled"))
-
-(async-response respond ;; together with async-response
-  (with-timeout respond 1000
-    (respond {:status 200 :body "service did not return in 1000ms"})
-    (let [result (call-a-long-running-service)]
-      ;; Call `respond` cancels the timeout if possible.
-      ;; If the timeout has already been invoked (the service takes more than 1000ms to return),
-      ;; `respond` will not run and return nil immediately.
-      (respond {:status 200 :body result}))))
-  {% endhighlight %}
-
   <h3>Recommended server deployment</h3>
   <p>http-kit runs alone happly, handy for development and quick deployment.
     Use reverse proxy like <a href="http://wiki.nginx.org/Main">Nginx</a>,
     <a href="http://www.lighttpd.net/">Lighthttpd</a>, etc in serious production is encouraged: </p>
   <ul>
-    <li>They are fast</li>
-    <li>They are heavily optimized for static content.</li>
+    <li>They are fast, heavily optimized for static content.</li>
     <li>They can be configured to compress the content sent to browsers</li>
   </ul>
   <p>Sample Nginx configration:</p>
   {% highlight sh %}
+upstream http_backend {
+    server 127.0.0.1:8090;  # http-kit listen on 8090
+    # keepalive improves performance
+    keepalive 32;  # both http-kit and nginx are good at concurrency
+}
+
 server {
-    location /static/ {  # static connent
+    location /static/ {  # static content
         alias   /var/www/xxxx/public/;
     }
     location / {
-        proxy_pass  http://127.0.0.1:8090/; # http-kit listen on 8090
+        proxy_pass  http://http_backend;
+
+        # tell http-kit, do not close the connection
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header Host $http_host;
+
         access_log  /var/log/nginx/xxxx.access.log;
     }
 }
