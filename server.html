@@ -63,9 +63,10 @@ title: HTTP server
 {% endhighlight %}
 
   <h3>asynchronous (long polling) extenstion</h3>
-  <p>All request-level middlewares applied to <code>req</code> before passing to <code>aync-handler</code> (like any other handler)</p>
   <p><code>respond</code> accept a standard ring-response (:status :headers :body) or just the :body</p>
+  <p>All request-level middlewares applied to <code>req</code> before passing to <code>aync-handler</code> (like any other handler)</p>
   <p><b class="message">The response is sent to client without response-level middlewares applied (a limitation, suggestions welcome)</b> </p>
+  <p>Optional timeout facilities: <a href="timer.html">timer</a></p>
   <p>A realtime chart example: <a href="https://github.com/http-kit/chat-polling">https://github.com/http-kit/chat-polling</a></p>
 
 {% highlight clojure %}
@@ -90,7 +91,7 @@ title: HTTP server
   {% highlight sh %}
 upstream http_backend {
     server 127.0.0.1:8090;  # http-kit listen on 8090
-    # keepalive improves performance
+    # keepalive(resue TCP connection) improves performance
     keepalive 32;  # both http-kit and nginx are good at concurrency
 }
 
@@ -101,7 +102,7 @@ server {
     location / {
         proxy_pass  http://http_backend;
 
-        # tell http-kit, do not close the connection
+        # tell http-kit to keep the connection
         proxy_http_version 1.1;
         proxy_set_header Connection "";
 
