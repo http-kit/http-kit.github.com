@@ -1,18 +1,17 @@
 ---
-layout: bounce
+layout: doc
 title: Migration from Jetty
 ---
 
-<div class="container">
-  <h2>Migrate from Ring Jetty adapter</h2>
-  <p>
-    HTTP Kit is an almost drop-in
-    replacement for the standard Ring Jetty adapter,
-    just replace <code>run-jetty</code> with <code>run-server</code>.
-  </p>
-  <p>Few differences:</p>
+<h2>Migrate from Ring Jetty adapter</h2>
+<p>
+  HTTP Kit is an almost drop-in
+  replacement for the standard Ring Jetty adapter,
+  just replace <code>run-jetty</code> with <code>run-server</code>.
+</p>
+<p>Few differences:</p>
 
-  <h3>Stop server programmatically</h3>
+  <h3 class="anchor" id="stop">Stop server programmatically</h3>
   {% highlight clojure %}
 (let [jetty (run-jetty app options)]
   (.stop jetty))
@@ -46,4 +45,3 @@ server {
 }
   {% endhighlight %}
   </p>
-</div>

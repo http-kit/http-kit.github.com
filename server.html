@@ -1,9 +1,8 @@
 ---
-layout: bounce
+layout: doc
 title: HTTP server
 ---
 
-<div class="container">
   <h2>Ring adapter(HTTP server) with async and websocket extenstion</h2>
 {% highlight clojure %}
 (:use org.httpkit.server)
@@ -14,7 +13,7 @@ title: HTTP server
     HTTP Kit is (<a href="migration.html">almost</a>) drop-in replacement of ring-jetty-adapter
   </p>
 
-  <h3 id="options">Hello, Clojure HTTP server</h3>
+  <h3 id="options" class="anchor">Hello, Clojure HTTP server</h3>
   <p> <code>run-server</code> starts a Ring-compatible HTTP server, <a href="#routing">routing using compojure</a></p>
 
 {% highlight clojure %}
@@ -25,7 +24,7 @@ title: HTTP server
 (run-server app {:port 8080})
 {% endhighlight %}
 
-  <h5>Options:</h5>
+  <h4>Options:</h4>
   <ul>
     <li><code>:ip</code>: which IP to bind, default to <code>0.0.0.0</code></li>
     <li><code>:port</code>: which port listens incomming request, default to 8090</li>
@@ -81,7 +80,7 @@ title: HTTP server
 (run-server async-handler {:port 8080})
 {% endhighlight %}
 
-  <h3 id="routing" class="anchor">Used together with Compojure: compojure do the routing</h3>
+  <h3 id="routing" class="anchor">Routing with Compojure</h3>
   <p>
     <a href="https://github.com/weavejester/compojure">Compojure</a> Can be used to do the routing, based on uri and method
   </p>
@@ -151,4 +150,3 @@ server {
     }
 }
   {% endhighlight %}
-</div>

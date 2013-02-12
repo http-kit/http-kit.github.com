@@ -1,8 +1,7 @@
 ---
-layout: bounce
+layout: doc
 title: Timer facility
 ---
-<div class="container">
 
   <h2 id="timer">Timer facility</h2>
   {% highlight clojure %}
@@ -10,7 +9,7 @@ title: Timer facility
   {% endhighlight %}
 
   <p>A general purpose, efficient timer is provided. </p>
-  <h3>schedule-task</h3>
+  <h3 class="anchor" id="schedule">schedule-task</h3>
   <p>
     schedules body for invocation after given time and returns a
     CancelableFutureTask. <code>(cancel task)</code> will cancel the task if possible and
@@ -24,7 +23,7 @@ title: Timer facility
   (if (timer/cancel task)
     (println "Task was cancelled")
     (println "Task already executed"))){% endhighlight %}
-  <h3>with-timeout</h3>
+  <h3 class="anchor" id="timeout">with-timeout</h3>
   <p>
     schedules timeout-form for invocation after given timeout and wraps named
     fn so that calling it with any arguments also cancels the timeout if possible.
@@ -45,5 +44,3 @@ title: Timer facility
       ;; `respond` will not run and return nil immediately.
       (respond {:status 200 :body result}))))
   {% endhighlight %}
-
-</div>

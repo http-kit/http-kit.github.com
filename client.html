@@ -1,10 +1,10 @@
 ---
-layout: bounce
+layout: doc
 title: HTTP client
 ---
-<div class="container">
-  <h2>HTTP client</h2>
-  {% highlight clojure %}
+
+<h2 id="title">HTTP client</h2>
+{% highlight clojure %}
 (:require [org.httpkit.client :as http])
   {% endhighlight %}
   <p>
@@ -17,7 +17,7 @@ title: HTTP client
     <li>Easy to use API, modeled after <a href="https://github.com/dakrone/clj-http">clj-http</a></li>
   </ul>
 
-  <h3>asynchronous request, get the promise</h3>
+  <h3 id="async" class="anchor">asynchronous with promise, callback</h3>
   {% highlight clojure %}
 ;fire and forget, returns immediately[1], returned promise is ignored
 (http/get "http://host.com/path")
@@ -35,7 +35,7 @@ title: HTTP client
  ; [1] may not always true, since DNS lookup maybe slow
   {% endhighlight %}
 
-  <h3> @promise, synchronous request</h3>
+  <h3  class="anchor" id="sync"> synchronous with @promise</h3>
   {% highlight clojure %}
 ;; synchronous
 (let [{:keys [status headers body error] :as resp} @(http/get "http://host.com/path")]
@@ -50,7 +50,7 @@ title: HTTP client
     (println "Async HTTP POST: " status)))
   {% endhighlight %}
 
-  <h3>combined, concurrent requests, handle results synchronously</h3>
+  <h3  class="anchor" id="combined">combined, concurrent requests, handle results synchronously</h3>
   <p>Sent request concurrently, half the waiting time</p>
 
 {% highlight clojure %}
@@ -59,4 +59,3 @@ title: HTTP client
   (println "Response 1's status " {:status @resp1}) ; wait as necessary
   (println "Response 2's status " {:status @resp2}))
 {% endhighlight %}
-</div>

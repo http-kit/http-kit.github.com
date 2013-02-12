@@ -26,5 +26,38 @@ li {
 
 .anchor {
     padding-top: 50px;
-    margin-top: -50px;
+/* margin-top: -50px; */
+}
+
+.bs-docs-sidenav {
+    padding: 0;
+    margin: 0;
+    background-color: #fff;
+    border-radius: 6px;
+    -webkit-box-shadow: 0 1px 4px rgba(0,0,0,.065);
+    -moz-box-shadow: 0 1px 4px rgba(0,0,0,.065);
+    box-shadow: 0 1px 4px rgba(0,0,0,.065);
+}
+
+.bs-docs-sidenav li {
+    padding: 0;
+}
+
+.bs-docs-sidenav li a {
+    /* padding: 8px 14px; */
+    padding: 10px 12px;
+    margin: 0 0 -1px;
+    border: 1px solid #e5e5e5;
+}
+
+
+#toc {
+    position: fixed;
+}
+
+@media (max-width: 767px) {
+    #toc {
+        position: static;
+    }
+
 }

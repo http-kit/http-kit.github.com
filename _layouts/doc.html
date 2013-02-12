@@ -51,7 +51,15 @@
         </div>
       </div>
     </div>
-    {{content}}
+    <div class="container">
+      <div class="row">
+        <div class="span3 bs-docs-sidebar">
+          <ul id="toc" class="nav nav-list bs-docs-sidenav span3"></ul>
+        </div>
+
+        <div class="span9">{{content}}</div>
+      </div>
+    </div>
     <div id="footer">
       <div class="container">
         <div class="row">
@@ -80,5 +88,30 @@
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
     <script src="/js/bootstrap.min.js"></script>
+    <script>
+      (function () {
+  var $toc = $('.bs-docs-sidenav');
+
+  function format (title) {
+    var $title = $(title),
+        txt = $title.text(),
+        id = $title.attr('id');
+    return "<li> <a href=#" + id + ">" + txt + "</a></li>";
+  }
+  // return;
+  if($toc.length) {
+    var $h3s = $('.span9 h3');
+    var titles = $h3s.map(function () {
+      return format(this);
+    }).get().join('');
+    $toc.html(titles);
+  }
+
+  // $('[data-spy="scroll"]').each(function () {
+    // var $spy = $(this).scrollspy('refresh');
+  // });
+
+})();
+    </script>
   </body>
 </html>
