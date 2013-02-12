@@ -11,7 +11,8 @@ title: Home
             <strong>Ring-compatible</strong> HTTP client/server for Clojure. It
             uses a <strong>event-driven</strong> architecture to support
             <strong>highly concurrent a/synchronous</strong> web applications
-            (including <strong>WebSocket</strong> applications).</p>
+            (including <strong><a href="server.html#websocket">WebSocket</a></strong>
+            applications).</p>
           {% highlight clojure %}
 [http-kit "2.0.0-RC4"] ; Add to your project.clj{% endhighlight %}
           <br />
@@ -56,7 +57,7 @@ title: Home
             HTTP Kit is an <a href="migration.html">(almost)</a> drop-in
             replacement for the standard Ring Jetty adapter. So you can use it
             with all your current libraries
-            (e.g. <a href="https://github.com/weavejester/compojure">Compojure</a>)
+            (e.g. <a href="server.html#routing">Compojure</a>)
             and middleware.
           </p>
         </div>
@@ -98,9 +99,11 @@ title: Home
       <div class="span4 bouncy">
         <h2>WebSockets and Comet</h2>
         <p>
-          With great out-the-box support for both WebSockets and efficient
-          handling of long-held HTTP requests, realtime web applications are a
-          breeze to write.
+          With great out-the-box support for both
+          <a href="server.html#websocket">WebSockets</a> and efficient
+          handling of
+          <a href="server.html#async">long-held HTTP requests</a>,
+          realtime web applications are a breeze to write.
         </p>
       </div>
 

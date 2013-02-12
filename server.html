@@ -4,7 +4,7 @@ title: HTTP server
 ---
 
 <div class="container">
-  <h2>HTTP server, ring adapter, with async and websocket extenstion</h2>
+  <h2>Ring adapter(HTTP server) with async and websocket extenstion</h2>
 {% highlight clojure %}
 (:use org.httpkit.server)
 {% endhighlight %}
@@ -14,16 +14,17 @@ title: HTTP server
     HTTP Kit is (<a href="migration.html">almost</a>) drop-in replacement of ring-jetty-adapter
   </p>
 
-  <h3 id="options">run-server starts standard Clojure web server</h3>
+  <h3 id="options">Hello, Clojure HTTP server</h3>
+  <p> <code>run-server</code> starts a Ring-compatible HTTP server, <a href="#routing">routing using compojure</a></p>
 
 {% highlight clojure %}
 (defn app [req]
   {:status  200
    :headers {"Content-Type" "text/html"}
-   :body    "hello word"})
-; you may want to use compojure for routing: https://github.com/weavejester/compojure
+   :body    "hello HTTP!"})
 (run-server app {:port 8080})
 {% endhighlight %}
+
   <h5>Options:</h5>
   <ul>
     <li><code>:ip</code>: which IP to bind, default to <code>0.0.0.0</code></li>
@@ -37,13 +38,14 @@ title: HTTP server
       <a href="http://stackoverflow.com/questions/417142/what-is-the-maximum-length-of-a-url">relevant discusstion on stackoverflow</a></li>
   </ul>
 
-  <h3>websocket extenstion</h3>
+  <h3 class="anchor" id="websocket">Websocket extenstion</h3>
   <ul>
     <li>
       <code>if-ws-request</code> or <code>when-ws-request</code>: get the websocket connection, returns websocket handshake
     </li>
-    <li><code>on-mesg</code>: register a fn to be called when there is message from client</li>
-    <li><code>send-mesg</code>: send message to client</li>
+    <li><code>on-mesg</code>: register a fn to be called when there is string message from client</li>
+    <li><code>send-mesg</code>: send string message to client. <i>Clojure data can be converted to string using
+        <a href="https://github.com/clojure/data.json">JSON</a> or <a href="https://github.com/edn-format/edn">edn</a></i></li>
     <li><code>close-conn</code>: close the websocket connection</li>
     <li><code>on-close</code>: register a fn to be called when the connecton is closed</li>
   </ul>
@@ -62,7 +64,7 @@ title: HTTP server
 (run-server chat-handler {:port 8080})
 {% endhighlight %}
 
-  <h3>asynchronous (long polling) extenstion</h3>
+  <h3 class="anchor"  id="async">Asynchronous (long polling) extenstion</h3>
   <p><code>respond</code> accept a standard ring-response (:status :headers :body) or just the :body</p>
   <p>All request-level middlewares applied to <code>req</code> before passing to <code>aync-handler</code> (like any other handler)</p>
   <p><b class="message">The response is sent to client without response-level middlewares applied (a limitation, suggestions welcome)</b> </p>
@@ -79,10 +81,46 @@ title: HTTP server
 (run-server async-handler {:port 8080})
 {% endhighlight %}
 
-  <h3>Recommended server deployment</h3>
+  <h3 id="routing" class="anchor">Used together with Compojure: compojure do the routing</h3>
+  <p>
+    <a href="https://github.com/weavejester/compojure">Compojure</a> Can be used to do the routing, based on uri and method
+  </p>
+
+{% highlight clojure %}
+(:use [compojure.route :only [files not-found]]
+      [compojure.handler :only [site]] ; form, query params decode; cookie; session, etc
+      [compojure.core :only [defroutes GET POST DELETE ANY context]]
+      org.httpkit.server)
+
+(defn show-landing-page [req] ;; ordinary clojure function, accept request map
+  ;; return landing page's html string. possible template library:
+  ;; mustache (https://github.com/shenfeng/mustache.clj, https://github.com/fhd/clostache...)
+  ;; enlive (https://github.com/cgrand/enlive),  hiccup(https://github.com/weavejester/hiccup)
+  )
+
+(defn update-userinfo [req]          ;; ordinary clojure function
+  (let [user-id (-> req :params :id)    ; param from uri
+        password (-> req :params :password)] ; form param
+    ....
+    ))
+
+(defroutes all-routes
+  (GET "/" [] show-landing-page)
+  (GET "/ws" [] chat-handler)     ;; websocket
+  (GET "/async" [] async-handler) ;; asynchronous(long polling)
+  (context "/user/:id" []
+           (GET / [] get-user-by-id)
+           (POST / [] update-userinfo))
+  (route/files "/static/") ;; static file url prefix /static, in `public` folder
+  (route/not-found "<p>Page not found.</p>")) ;; all other, return 404
+
+(run-server (site #'all-routes) {:port 8080})
+  {% endhighlight %}
+
+  <h3 class="anchor" id="deploy">Recommended server deployment</h3>
   <p>http-kit runs alone happly, handy for development and quick deployment.
     Use reverse proxy like <a href="http://wiki.nginx.org/Main">Nginx</a>,
-    <a href="http://www.lighttpd.net/">Lighthttpd</a>, etc in serious production is encouraged: </p>
+    <a href="http://www.lighttpd.net/">Lighthttpd</a>, etc in serious production is encouraged. They also <a href="migration.html#https">add https support</a>.</p>
   <ul>
     <li>They are fast, heavily optimized for static content.</li>
     <li>They can be configured to compress the content sent to browsers</li>

@@ -23,3 +23,8 @@ li {
 .message {
     color: #d00;
 }
+
+.anchor {
+    padding-top: 50px;
+    margin-top: -50px;
+}

@@ -21,9 +21,9 @@ title: Migration from Jetty
   ;; run-server return a function that stops the server
   (server))
   {% endhighlight %}
-  <h3>Configuring HTTPS</h3>
+  <h3 class="anchor" id="https">Configuring HTTPS</h3>
   <p>
-    http-kit relies reverse proxy (like <a href="http://wiki.nginx.org/HttpSslModule">Nginx</a>, <a href="http://redmine.lighttpd.net/projects/1/wiki/Docs_SSL">Lighthttpd</a>) to support HTTPS.
+    http-kit relies reverse proxy (like <a href="http://wiki.nginx.org/HttpSslModule">Nginx</a>, <a href="http://redmine.lighttpd.net/projects/1/wiki/Docs_SSL">Lighthttpd</a>) to support HTTPS. <i>They also can be used as <a href="server.html#deploy">reverse proxy to serve static files, compress content.</a></i>
   </p>
   <p>
     <a href="https://github.com/bumptech/stud">Stud</a> is another option. It works well with websocket and long polling.
