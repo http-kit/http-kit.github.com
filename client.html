@@ -43,7 +43,7 @@ title: HTTP client
     (println "Failed, exception: " error)
     (println "HTTP GET success: " status)))
 ;; Form params
-(let [options {:form-parmas {:name "http-kit" :features ["async" "client" "server"]}}
+(let [options {:form-params {:name "http-kit" :features ["async" "client" "server"]}}
       {:keys [status error]} @(http/post "http://host.com/path1" options)]
   (if error
     (println "Failed, exception is " error)
