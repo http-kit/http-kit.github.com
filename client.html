@@ -35,6 +35,19 @@ title: HTTP client
  ; [1] may not always true, since DNS lookup maybe slow
   {% endhighlight %}
 
+  <h3 class="anchor" id="state">Pass state to callback</h3>
+  {% highlight clojure %}
+(defn callback [{:keys [status headers body error opts]}]
+  ;; opts contains :url :method :header + user defined key(s)
+  (let [{:keys [method start-time url]} opts]
+    (println method  url "status" status "takes time"
+             (- (System/currentTimeMillis) start-time) "ms")))
+
+;;; save state for callback, useful for async request
+(let [opts {:start-time (System/currentTimeMillis)}]
+  (http/get "http://http-kit.org" opts callback))
+  {% endhighlight %}
+
   <h3  class="anchor" id="sync"> synchronous with @promise</h3>
   {% highlight clojure %}
 ;; synchronous
