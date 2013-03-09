@@ -61,3 +61,11 @@ li {
     }
 
 }
+
+.note {
+    /* color: #c00; */
+}
+.note a {
+    text-decoration: underline;
+    color: #c00;
+}

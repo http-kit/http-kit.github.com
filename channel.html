@@ -1,0 +1,126 @@
+---
+layout: doc
+title: Unified Async/Websocket API
+---
+
+<h2>Unified Async/Websocket API</h2>
+
+<p>Using the latest and greatest:</p>
+{% highlight clojure %}
+[http-kit "2.0.0-SNAPSHOT"] ; Add to your project.clj
+
+(:use org.httpkit.server) ; import namespace
+{% endhighlight %}
+
+<p class="note">
+  The API is fully working, but is still working in progress.
+  If interested, use <a href="https://github.com/http-kit/http-kit/issues">GitHub issues page</a> for suggestions, bug reports, or general discussions.
+  Please refer <a href="https://github.com/http-kit/http-kit/blob/protocol-api/src/org/httpkit/server.clj">server.clj</a> more detail, it has pretty clear docstr.
+</p>
+
+<p class="note">
+  This API is not compatabile with `2.0.0-rc4`.
+</p>
+
+<h3 id="motivation" class="anchor">Motivation</h3>
+
+<ul>
+  <li>Support HTTP streaming</li>
+  <li>Unify the API for HTTP (streaming or long-polling) and WebSockets: easy degradate to long-polling/streaming when WebSocket is not available in client</li>
+  <li>Sever also get notified when client close/away for long-polling/streaming</li>
+</ul>
+
+<h3 id="protocol" class="anchor">Channel Protocol</h3>
+
+<p>Unified asynchronous channel interface for HTTP (streaming or long-polling) and WebSockets.</p>
+
+Channel defines the following contract:
+<ul>
+  <li>
+    <code>open?</code>: Returns true iff channel is open.
+  </li>
+  <li>
+    <code>close</code>: Closes the channel. Idempotent: returns true if the channel was actually closed, or false if it was already closed.
+  </li>
+  <li>
+    <code>websocket?</code>: Returns true iff channel is a WebSocket.
+  </li>
+  <li>
+    <code>send!</code>:
+    Sends data to client and returns true if the data was successfully sent,
+    or false if the channel is closed. Data is sent directly to the client,
+    NO RING MIDDLEWARE IS APPLIED.
+
+    Data form: {:headers _ :status _ :body _} or just body. Note that :headers
+    and :status will be stripped for WebSockets and for HTTP streaming responses
+    after the first.
+  </li>
+  <li>
+    <code>on-receive</code>:
+    Sets handler (fn [message-string]) for notification of client WebSocket
+    messages. Message ordering is guaranteed by server.
+  </li>
+  <li>
+    <code>on-close</code>:
+    Sets handler (fn [status]) for notification of channel being closed by the
+    server or client. Handler will be invoked at most once. Useful for clean-up
+  </li>
+</ul>
+
+<h3 id="get-channel" class="anchor">Get the channel</h3>
+
+<p>A macro <code>with-channel</code> is provided, example: </p>
+
+{% highlight clojure %}
+(defn handler [req]
+  (with-channel req channel ;; get the channel,
+    ;; channel can be HTTP(long-polling, streaming) or Websocket
+    ;; manipulate them with a unified API
+    ))
+{% endhighlight %}
+
+<h3 id="polling" class="anchor">Long polling exmaple</h3>
+
+<p>long polling is very much like streaming</p>
+
+{% highlight clojure %}
+(defn handler [request]
+  (with-channel request channel
+    (on-some-event ;; wait for event
+     (send! channel {:status 200
+                     :headers {"Content-Type" "application/json; charset=utf-8"}
+                     :body "polling resulg"}
+            true))))                    ; send! and close
+
+(run-server handler {:port 9090})
+{% endhighlight %}
+
+
+<h3 id="streaming" class="anchor">Streaming example</h3>
+{% highlight clojure %}
+(defn handler [request]
+  (with-channel request channel
+    (loop [id 0]
+      (when (< id 10)
+        (schedule-task (* id 200) ;; sent a message every 200ms
+                       (send! channel (str "message from server #" id)))
+        (recur (inc id))))
+    (schedule-task 10000
+                   ;; close in 10s
+                   (close channel))))
+
+;;; open you browser http://127.0.0.1:9090, a new message show up every 200ms
+(run-server handler {:port 9090})
+{% endhighlight %}
+
+<h3 id="websocket" class="anchor">Websocket excample</h3>
+
+{% highlight clojure %}
+(defn handler [request]
+  (with-channel request channel
+    (on-receive channel (fn [data]
+                          ;; echo it back
+                          (send! channel data)))))
+
+(run-server handler {:port 9090})
+{% endhighlight %}
