@@ -126,3 +126,58 @@ Channel defines the following contract:
 
 (run-server handler {:port 9090})
 {% endhighlight %}
+
+<h3 id="channel-group" class="anchor">A utility: ChannelStore</h3>
+
+  <p>I find a utility like ChannelStore(or ChannelGroup) is quite helpful when using the API</p>
+
+{% highlight clojure %}
+(defprotocol ChannelStore
+  (add-to-group [store group ch attach])
+  (remove-from-group [store group ch])
+  (broadcast [store group fn]))
+
+;;; implementation using atom.
+(deftype MemoryChannelStore [store-map]
+  ChannelStore
+  (add-to-group [_ group ch attach]
+    (swap! store-map (fn [old-store]
+                       (assoc old-store
+                         group
+                         (assoc (or (old-store group) {})
+                           ch attach)))))
+  (remove-from-group [_ group ch]
+    (swap! store-map (fn [old-store]
+                       (let [m (update-in old-store [group] dissoc ch)]
+                         (if (empty? (m group))
+                           (dissoc m group)
+                           m)))))
+  (broadcast [store group f]
+    (doseq [[ch attach] (@store-map group)]
+      (if (websocket? ch)
+        ;; give back attachment (some state for pass back)
+        (send! ch (json-str (f ch attach)))
+        (send! ch {:status 200
+                   :headers {"Content-Type"
+                             "application/json; charset=utf-8"}
+                   :body (json-str (f ch attach))}
+               true)))))                ; close it
+
+;;; example usage
+(defonce channel-store (MemoryChannelStore. (atom {})))
+(defn handler [req]
+  (let [group (-> req :params :group)
+        since_ts (-> req :params :since_ts)] ;; state variable, from client
+    (with-channel req ch
+      (add-to-group channel-store group ch since_ts)
+      (on-close ch (fn [status]
+                     (remove-from-group channel-store group ch))))))
+
+;;; some logic in other place
+(on-some-event
+ (broadcast channel-store a-group
+            (fn [ch since_ts] ; since_ts is passed back.
+              (some-data-return-to-clients since_ts))))
+  {% endhighlight %}
+
+  <p>If this is proven to be useful, http-kit can provide a built in more efficient implentation</p>
