@@ -103,7 +103,9 @@ Channel defines the following contract:
     (loop [id 0]
       (when (< id 10)
         (schedule-task (* id 200) ;; sent a message every 200ms
-                       (send! channel (str "message from server #" id)))
+                       ;; send and do not close
+                       ;; default true for streaming, false for websocket
+                       (send! channel (str "message from server #" id) false))
         (recur (inc id))))
     (schedule-task 10000
                    ;; close in 10s
