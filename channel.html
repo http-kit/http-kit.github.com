@@ -1,6 +1,6 @@
 ---
 layout: doc
-title: Unified Async/Websocket API
+title: Unified Async/WebSocket API
 ---
 
 <h2>Unified Async/Websocket API</h2>
@@ -19,7 +19,7 @@ title: Unified Async/Websocket API
 </p>
 
 <p class="note">
-  This API is not compatabile with `2.0.0-rc4`.
+  This API is not compatible with `2.0.0-rc4`.
 </p>
 
 <h3 id="motivation" class="anchor">Motivation</h3>
@@ -29,13 +29,13 @@ title: Unified Async/Websocket API
 <ul>
   <li>Simpler and more consistent than previous one</li>
   <li>New feature: HTTP streaming</li>
-  <li>Unify the API for HTTP (streaming or long-polling) and WebSockets: easy degradate to long-polling/streaming when WebSocket is not available in client</li>
+  <li>Unify the API for HTTP (streaming or long-polling) and WebSocket: allow gracefully degrading to long-polling/streaming when WebSocket is not available in client</li>
   <li>Sever also get notified when client close/away for long-polling/streaming</li>
 </ul>
 
 <h3 id="protocol" class="anchor">Channel Protocol</h3>
 
-<p>Unified asynchronous channel interface for HTTP (streaming or long-polling) and WebSockets.</p>
+<p>Unified asynchronous channel interface for HTTP (streaming or long-polling) and WebSocket.</p>
 
 Channel defines the following contract:
 <ul>
@@ -55,7 +55,7 @@ Channel defines the following contract:
     NO RING MIDDLEWARE IS APPLIED.
 
     Data form: {:headers _ :status _ :body _} or just body. Note that :headers
-    and :status will be stripped for WebSockets and for HTTP streaming responses
+    and :status will be stripped for WebSocket and for HTTP streaming responses
     after the first.
   </li>
   <li>
@@ -82,7 +82,7 @@ Channel defines the following contract:
     ))
 {% endhighlight %}
 
-<h3 id="polling" class="anchor">Long polling exmaple</h3>
+<h3 id="polling" class="anchor">Long polling example</h3>
 
 <p>long polling is very much like streaming</p>
 
@@ -92,7 +92,7 @@ Channel defines the following contract:
     (on-some-event ;; wait for event
      (send! channel {:status 200
                      :headers {"Content-Type" "application/json; charset=utf-8"}
-                     :body "polling resulg"}
+                     :body "hello, polling"}
             true))))  ; send! and close. just be explicit, true is the default for streaming/polling,
 
 (run-server handler {:port 9090})
@@ -115,7 +115,7 @@ Channel defines the following contract:
 (run-server handler {:port 9090})
 {% endhighlight %}
 
-<h3 id="websocket" class="anchor">Websocket excample</h3>
+<h3 id="websocket" class="anchor">Websocket example</h3>
 
 {% highlight clojure %}
 (defn handler [request]
@@ -181,3 +181,12 @@ Channel defines the following contract:
   {% endhighlight %}
 
   <p>If this is proven to be useful, http-kit can provide a built in more efficient implentation</p>
+
+<!--  LocalWords:  clojure defn json charset utf endhighlight fn str
+ -->
+<!--  LocalWords:  println Websocket defprotocol ChannelStore ch req
+ -->
+<!--  LocalWords:  deftype MemoryChannelStore assoc dissoc doseq
+ -->
+<!--  LocalWords:  websocket defonce params
+ -->
