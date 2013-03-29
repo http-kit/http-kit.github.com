@@ -13,8 +13,6 @@ title: HTTP server
     HTTP Kit is (<a href="migration.html">almost</a>) drop-in replacement of ring-jetty-adapter
   </p>
 
-          <p class="note"><a href="channel.html">A new unified Async/Websocket API(working in progress)</a></p>
-
   <h3 id="options" class="anchor">Hello, Clojure HTTP server</h3>
   <p> <code>run-server</code> starts a Ring-compatible HTTP server, <a href="#routing">routing using compojure</a></p>
 
@@ -39,48 +37,132 @@ title: HTTP server
       <a href="http://stackoverflow.com/questions/417142/what-is-the-maximum-length-of-a-url">relevant discusstion on stackoverflow</a></li>
   </ul>
 
-  <h3 class="anchor" id="websocket">Websocket extenstion</h3>
-  <ul>
-    <li>
-      <code>if-ws-request</code> or <code>when-ws-request</code>: get the websocket connection, returns websocket handshake
-    </li>
-    <li><code>on-mesg</code>: register a fn to be called when there is string message from client</li>
-    <li><code>send-mesg</code>: send string message to client. <i>Clojure data can be converted to string using
-        <a href="https://github.com/clojure/data.json">JSON</a> or <a href="https://github.com/edn-format/edn">edn</a></i></li>
-    <li><code>close-conn</code>: close the websocket connection</li>
-    <li><code>on-close</code>: register a fn to be called when the connecton is closed</li>
-  </ul>
-  <p>For WebSocket Secure connection, one option is <a href="https://github.com/bumptech/stud">stud</a> (self-signed certificate may not work with websocket)</p>
-  <p>A realtime chart example: <a href="https://github.com/http-kit/chat-websocket">https://github.com/http-kit/chat-websocket</a></p>
+  <h3 class="anchor" id="channel">Unified Async/Websocket With Channel</h3>
+<p class="red">The with-channel API is not compatible with the RC releases. The new is better and much easier to understand and use. The old's documentation is <a href="server_old.html">here</a></p>
+
+<p>Unified asynchronous channel interface for HTTP (streaming or long-polling) and WebSockets.</p>
+
+Channel defines the following contract:
+<ul>
+  <li>
+    <code>open?</code>: Returns true iff channel is open.
+  </li>
+  <li>
+    <code>close</code>: Closes the channel. Idempotent: returns true if the channel was actually closed, or false if it was already closed.
+  </li>
+  <li>
+    <code>websocket?</code>: Returns true iff channel is a WebSocket.
+  </li>
+  <li>
+    <code>send!</code>:
+    Sends data to client and returns true if the data was successfully sent, or false if the channel is closed. Normally, check the returned value is not needed.
+    <div class="send-doc">
+      <p class="red">Data is sent directly to the client, NO RING MIDDLEWARE IS APPLIED.</p>
+      <p>Data form: {:headers _ :status _ :body _} or just body. Note that :headers
+        and :status will be stripped for WebSockets and for HTTP streaming responses
+        after the first.</p>
+    </div>
+
+  </li>
+  <li>
+    <code>on-receive</code>:
+    Sets handler (fn [message-string || byte[]) for notification of client WebSocket
+    messages. Message ordering is guaranteed by server.
+  </li>
+  <li>
+    <code>on-close</code>:
+    Sets handler (fn [status]) for notification of channel being closed by the
+    server or client. Handler will be invoked at most once. Useful for clean-up
+  </li>
+</ul>
+
+
+  <!-- <p>A realtime chart example: <a href="https://github.com/http-kit/chat-websocket">https://github.com/http-kit/chat-websocket</a></p> -->
 
   {% highlight clojure %}
 
-(defn chat-handler [req]
-  (when-ws-request req ws-con  ; ws-con bind to the websocket connection
-     (on-mesg ws-con (fn [msg]
-                         (send-mesg ws-con msg) ;; echo back
-                         (close-conn ws-con)))  ;; close the connection
-     (on-close ws-con (fn [status] (println ws-con "closed")))))
-
+(defn handler [req]
+  (with-channel req channel              ; get the channel
+    ;; communicate with client using method defined above
+    (on-close channel (fn [status]
+                        (println "channel closed")))
+    (if (websocket? channel)
+      (println "WebSocket channel")
+      (println "HTTP channel"))
+    (on-receive channel (fn [data]       ; data received from client
+           ;; An optional param can pass to send!: close-after-send?
+           ;; When unspecified, `close-after-send?` defaults to true for HTTP channels
+           ;; and false for WebSocket.  (send! channel data close-after-send?)
+                          (send! channel data))))) ; data is sent directly to the client
 (run-server chat-handler {:port 8080})
 {% endhighlight %}
 
-  <h3 class="anchor"  id="async">Asynchronous (long polling) extenstion</h3>
-  <p><code>respond</code> accept a standard ring-response (:status :headers :body) or just the :body</p>
-  <p>All request-level middlewares applied to <code>req</code> before passing to <code>aync-handler</code> (like any other handler)</p>
-  <p><b class="message">The response is sent to client without response-level middlewares applied (a limitation, suggestions welcome)</b> </p>
-  <p>Optional timeout facilities: <a href="timer.html">timer</a></p>
-  <p>A realtime chart example: <a href="https://github.com/http-kit/chat-polling">https://github.com/http-kit/chat-polling</a></p>
+  <h3 class="anchor" id="async">HTTP Streaming example</h3>
+
+  <ul>
+    <li>First call of <code>send!</code>,
+      send HTTP status and Headers to client</li>
+    <li>After the first, <code>send!</code> send a chunk to client</li>
+    <li> <code>close</code> send an empty chunk to client, mark as end of the response </li>
+    <li>Client close notification via <code>on-close</code></li>
+  </ul>
 
 {% highlight clojure %}
-(defn async-handler [req]
-  ; respond is a one-time function, can be called on any thread to send the response to client
-  (async-response respond
-                  ; just :body, can also be {:status _ :headers _ :body _}
-                  (future (respond "hello world async"))))
+(defn handler [request]
+  (with-channel request channel
+    (on-close channel (fn [status] (println "closed by sever, or client")))
+    (loop [id 0]
+      (when (< id 10)
+        (schedule-task (* id 200) ;; sent a message every 200ms
+                       (send! channel (str "message from server #" id) false)) ; false => don't close after send
+        (recur (inc id))))
+    (schedule-task 10000 (close channel)))) ;; close in 10s.
 
-(run-server async-handler {:port 8080})
+;;; open you browser http://127.0.0.1:9090, a new message show up every 200ms
+(run-server handler {:port 9090})
 {% endhighlight %}
+
+    <h3 id="polling" class="anchor">Long polling exmaple</h3>
+    <p>long polling is very much like streaming</p>
+
+{% highlight clojure %}
+(defn handler [request]
+  (with-channel request channel
+    (on-some-event ;; wait for event
+     (send! channel {:status 200
+                     :headers {"Content-Type" "application/json; charset=utf-8"}
+                     :body "polling result"}
+        ; send! and close. just be explicit, true is the default for streaming/polling,
+                    true))))
+
+(run-server handler {:port 9090})
+{% endhighlight %}
+
+<h3 id="websocket" class="anchor">Websocket excample</h3>
+
+<ul>
+  <li>Two way communication bettween client and server</li>
+  <li>Can Easy degradate to HTTP long polling/streaming, since the unified API</li>
+  <li>
+    <code>send!</code> with <code>java.lang.String</code>, a text frame assembled and sent to client
+  </li>
+  <li>
+    <code>send!</code> with <code>java.io.InputStream</code> or <code>byte[]</code>, a binary frame assembled and sent to client
+  </li>
+  <li>For WebSocket Secure connection, one option is <a href="https://github.com/bumptech/stud">stud</a> (self-signed certificate may not work with websocket).
+    <a href="http://nginx.com/news/nginx-websockets.html">Nginx</a> can do it too.</li>
+</ul>
+
+{% highlight clojure %}
+(defn handler [request]
+  (with-channel request channel
+    (on-close channel (fn [status] (println "client close it" status)))
+    (on-receive channel (fn [data] ;; echo it back
+                          (send! channel data)))))
+
+(run-server handler {:port 9090})
+{% endhighlight %}
+
 
   <h3 id="routing" class="anchor">Routing with Compojure</h3>
   <p>
@@ -96,7 +178,8 @@ title: HTTP server
 (defn show-landing-page [req] ;; ordinary clojure function, accept request map
   ;; return landing page's html string. possible template library:
   ;; mustache (https://github.com/shenfeng/mustache.clj, https://github.com/fhd/clostache...)
-  ;; enlive (https://github.com/cgrand/enlive),  hiccup(https://github.com/weavejester/hiccup)
+  ;; enlive (https://github.com/cgrand/enlive)
+  ;; hiccup(https://github.com/weavejester/hiccup)
   )
 
 (defn update-userinfo [req]          ;; ordinary clojure function
@@ -130,6 +213,7 @@ title: HTTP server
   {% highlight sh %}
 upstream http_backend {
     server 127.0.0.1:8090;  # http-kit listen on 8090
+    # put more server here for load balance
     # keepalive(resue TCP connection) improves performance
     keepalive 32;  # both http-kit and nginx are good at concurrency
 }

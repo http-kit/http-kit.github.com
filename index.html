@@ -14,10 +14,9 @@ title: Home
             (including <strong><a href="server.html#websocket">WebSocket</a></strong>
             applications).</p>
           {% highlight clojure %}
-[http-kit "2.0.0-RC4"] ; Add to your project.clj{% endhighlight %}
+[http-kit "2.0.0"] ; Add to your project.clj.
+          {% endhighlight %}
           <br />
-
-          <p class="note"><a href="channel.html">A new unified Async/Websocket API(working in progress)</a></p>
 
           <h3>Recent Blog Posts</h3>
           <ul>
@@ -29,17 +28,20 @@ title: Home
         <div class="span7">
           <h3>HTTP Server <a class="more" href="server.html">documentation</a></h3>
           {% highlight clojure %}
-(defn my-async-handler [ring-request]
-  (async-response respond ; Use this callback when ready
-    (future ; Respond from any thread!
-      (respond {:status 200
-                :headers {"Content-Type" "text/plain"}
-                :body    "This response was delivered asynchronously!"}))))
+(defn async-handler [ring-request]
+  ;; unified API for WebSocket and HTTP long polling/streaming
+  (with-channel ring-request channel    ; get the channel
+    (if (websocket? channel)            ; if you want to distinguish them
+      (on-receive channel (fn [data]     ; two way communication
+                            (send! channel data)))
+      (send! channel {:status 200
+                      :headers {"Content-Type" "text/plain"}
+                      :body    "Long polling?"}))))
 
-(run-server my-async-handler {:port 8080}) ; Ring server{% endhighlight %}
+(run-server async-handler {:port 8080}) ; Ring server{% endhighlight %}
           <h3>HTTP Client <a class="more" href="client.html">documentation</a></h3>
           {% highlight clojure %}
-;; Start concurrent requests, return promises:
+;; start concurrent requests, get promise, half the waiting time
 (let [response1 (http-kit/get "http://http-kit.org/")
       response2 (http-kit/get "http://clojure.org/")]
   ;; Handle responses one-by-one, blocking as necessary

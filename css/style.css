@@ -69,3 +69,12 @@ li {
     text-decoration: underline;
     color: #c00;
 }
+
+.red {
+    color: #c00;
+}
+
+.send-doc p {
+    margin: 5px 0;
+    /* text-indent: 3.7em; */
+}

@@ -10,13 +10,14 @@ title: http-kit is clean and small, less is exponentially more
 * [HTTP Client](http://http-kit.org/client.html): event-driven, asynchronous with promise, synchronous with @promise, keep-alive
 * [Timer facility](http://http-kit.org/timer.html)
 
-**All the above + high concurrency + high performance + nice API + written from scrach = ~3K lines of code.**
 
-**Clojure is awesome**
+All the above + high concurrency + high performance + nice API + written from scrach = ~3K lines of code.
 
-**Clojure + JAVA = Performance + Nice API**
+Clojure is awesome
 
-**Less is exponentially more**
+Clojure + JAVA = Performance + Nice API
+
+Less is exponentially more
 
   <pre>
     http://cloc.sourceforge.net v 1.56  T=0.5 s (94.0 files/s, 8216.0 lines/s)
@@ -32,3 +33,5 @@ title: http-kit is clean and small, less is exponentially more
 
 
 *cloc runned time: Tue Feb  5 23:23:58 CST 2013, on master branch, from src directory*
+
+*Edit: 2013/3/29 with release 2.0.0, the codebase is slightly larger: 2970 lines of Java, 266 lines of Clojure*
