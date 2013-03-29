@@ -5,14 +5,13 @@ title: Home
 <div id="landing">
   <div class="container">
     <div class="row">
-        <div class="span5">
-          <h1>HTTP Client/Server for Clojure</h1>
-          <p>HTTP Kit is a <strong>small</strong>, <strong>efficient</strong>,
+        <div class="span6">
+          <h1>HTTP client/server for Clojure</h1>
+          <p>HTTP Kit is a <strong>minimalist</strong>, <strong>efficient</strong>,
             <strong>Ring-compatible</strong> HTTP client/server for Clojure. It
             uses a <strong>event-driven</strong> architecture to support
-            <strong>highly concurrent a/synchronous</strong> web applications
-            (including <strong><a href="server.html#websocket">WebSocket</a></strong>
-            applications).</p>
+            <strong>highly concurrent a/synchronous</strong> web applications.
+            Feature <a href="http://http-kit.org/server.html#channel">a unified API</a> for WebSocket and HTTP long polling/streaming</p>
           {% highlight clojure %}
 [http-kit "2.0.0"] ; Add to your project.clj.
           {% endhighlight %}
@@ -25,7 +24,7 @@ title: Home
             {% endfor %}
           </ul>
         </div>
-        <div class="span7">
+        <div class="span6">
           <h3>HTTP Server <a class="more" href="server.html">documentation</a></h3>
           {% highlight clojure %}
 (defn async-handler [ring-request]
