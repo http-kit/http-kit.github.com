@@ -35,12 +35,13 @@ title: Timer facility
    (Thread/sleep (rand-nth [900 700]))
    (println "Timeout task was cancelled"))
 
-(async-response respond ;; together with async-response
-  (with-timeout respond 1000
-    (respond {:status 200 :body "service did not return in 1000ms"})
-    (let [result (call-a-long-running-service)]
-      ;; Call `respond` cancels the timeout if possible.
-      ;; If the timeout has already been invoked (the service takes more than 1000ms to return),
-      ;; `respond` will not run and return nil immediately.
-      (respond {:status 200 :body result}))))
+(defn handler [req]
+  (with-channel req channel
+    (with-timeout send! 1000
+      (send! {:status 200 :body "service did not return in 1000ms"})
+      (let [result (call-a-long-running-service)]
+        ;; Call `send!` cancels the timeout if possible.
+        ;; If the timeout has already been invoked (the service takes more than 1000ms to return),
+        ;; `send!` will not run and return nil immediately.
+        (send! {:status 200 :body result})))))
   {% endhighlight %}

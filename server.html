@@ -14,7 +14,7 @@ title: HTTP server
   </p>
 
   <h3 id="options" class="anchor">Hello, Clojure HTTP server</h3>
-  <p> <code>run-server</code> starts a Ring-compatible HTTP server, <a href="#routing">routing using compojure</a></p>
+  <p> <code>run-server</code> starts a Ring-compatible HTTP server. You may want to do <a href="#routing">routing with compojure</a></p>
 
 {% highlight clojure %}
 (defn app [req]
@@ -40,7 +40,7 @@ title: HTTP server
   <h3 class="anchor" id="channel">Unified Async/Websocket With Channel</h3>
 <p class="red">The with-channel API is not compatible with the RC releases. The new is better and much easier to understand and use. The old's documentation is <a href="server_old.html">here</a></p>
 
-<p>Unified asynchronous channel interface for HTTP (streaming or long-polling) and WebSockets.</p>
+<p>Unified asynchronous channel interface for HTTP (streaming or long-polling) and WebSocket.</p>
 
 Channel defines the following contract:
 <ul>
@@ -110,7 +110,7 @@ Channel defines the following contract:
 {% highlight clojure %}
 (defn handler [request]
   (with-channel request channel
-    (on-close channel (fn [status] (println "closed by sever, or client")))
+    (on-close channel (fn [status] (println "channel closed, " status)))
     (loop [id 0]
       (when (< id 10)
         (schedule-task (* id 200) ;; sent a message every 200ms
@@ -122,7 +122,7 @@ Channel defines the following contract:
 (run-server handler {:port 9090})
 {% endhighlight %}
 
-    <h3 id="polling" class="anchor">Long polling exmaple</h3>
+    <h3 id="polling" class="anchor">Long polling example</h3>
     <p>long polling is very much like streaming</p>
 
 {% highlight clojure %}
@@ -138,7 +138,7 @@ Channel defines the following contract:
 (run-server handler {:port 9090})
 {% endhighlight %}
 
-<h3 id="websocket" class="anchor">Websocket excample</h3>
+<h3 id="websocket" class="anchor">Websocket example</h3>
 
 <ul>
   <li>Two way communication bettween client and server</li>
@@ -156,7 +156,7 @@ Channel defines the following contract:
 {% highlight clojure %}
 (defn handler [request]
   (with-channel request channel
-    (on-close channel (fn [status] (println "client close it" status)))
+    (on-close channel (fn [status] (println "channel closed: " status)))
     (on-receive channel (fn [data] ;; echo it back
                           (send! channel data)))))
 
@@ -175,7 +175,7 @@ Channel defines the following contract:
       [compojure.core :only [defroutes GET POST DELETE ANY context]]
       org.httpkit.server)
 
-(defn show-landing-page [req] ;; ordinary clojure function, accept request map
+(defn show-landing-page [req] ;; ordinary clojure function, accepts a request map, returns a response map
   ;; return landing page's html string. possible template library:
   ;; mustache (https://github.com/shenfeng/mustache.clj, https://github.com/fhd/clostache...)
   ;; enlive (https://github.com/cgrand/enlive)
@@ -202,11 +202,12 @@ Channel defines the following contract:
   {% endhighlight %}
 
   <h3 class="anchor" id="deploy">Recommended server deployment</h3>
-  <p>http-kit runs alone happly, handy for development and quick deployment.
+  <p>http-kit runs alone happily, handy for development and quick deployment.
     Use reverse proxy like <a href="http://wiki.nginx.org/Main">Nginx</a>,
-    <a href="http://www.lighttpd.net/">Lighthttpd</a>, etc in serious production is encouraged. They also <a href="migration.html#https">add https support</a>.</p>
+    <a href="http://www.lighttpd.net/">Lighthttpd</a>, etc in serious production is encouraged.
+    They also be used to<a href="migration.html#https">add https support</a>.</p>
   <ul>
-    <li>They are fast, heavily optimized for static content.</li>
+    <li>They are fast, heavily optimized for static contents.</li>
     <li>They can be configured to compress the content sent to browsers</li>
   </ul>
   <p>Sample Nginx configration:</p>
@@ -219,7 +220,7 @@ upstream http_backend {
 }
 
 server {
-    location /static/ {  # static content
+    location /static/ {  # static contents
         alias   /var/www/xxxx/public/;
     }
     location / {
