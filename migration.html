@@ -45,3 +45,47 @@ server {
 }
   {% endhighlight %}
   </p>
+
+  <h3 class="anchor" id="reload">Hot code reload(lein ring server)</h3>
+
+    <p>Hot reload code is very handly, with the Jetty one you can do something like:</p>
+    {% highlight sh %}
+lein ring server  # https://github.com/weavejester/lein-ring
+    {% endhighlight %}
+    <p><code>lein-ring</code> does not support http-kit yet, a workaround is by using
+      <code>ring.middleware.reload</code></p>
+
+{% highlight sh %}
+lein run # start a server in :8080, hot reload code
+{% endhighlight %}
+
+
+    {% highlight clojure %}
+;; project.clj
+(defproject xxxx "1.0.1"
+  :dependencies [[org.clojure/clojure "1.4.0"]
+                 [compojure "1.1.5"]
+                 [ring/ring-devel "1.1.8"]
+                 [ring/ring-core "1.1.8"]
+                 [http-kit "2.0.0"]]
+  ; allow lein run to find a place to start
+  :main clj_web.main)
+
+;; src/clj_web/main.clj
+(ns clj_web.main
+  (:use [org.httpkit.server :only [run-server]])
+  (:require [ring.middleware.reload :as reload]
+            [compojure.handler :only [site]]
+            [compojure.core :only [defroutes GET POST]]))
+
+(defroutes all-routes
+  (GET "/" [] "handling-page")
+  (GET "/save" [] handler)     ;; websocket
+  (route/not-found "<p>Page not found.</p>")) ;; all other, return 404
+
+(defn -main [& args]
+  (let [handler (if (in-dev? args)
+                  (reload/wrap-reload (site #'all-routes)) ;; only reload when dev
+                  (site all-routes))]
+    (run-server handler {:port 8080})))
+    {% endhighlight %}
