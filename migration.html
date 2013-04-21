@@ -48,17 +48,16 @@ server {
 
   <h3 class="anchor" id="reload">Hot code reload(lein ring server)</h3>
 
-    <p>Hot reload code is very handly, with the Jetty one you can do something like:</p>
+    <p>Hot code reload is very handy, with the Jetty one you can do something like:</p>
     {% highlight sh %}
 lein ring server  # https://github.com/weavejester/lein-ring
     {% endhighlight %}
-    <p><code>lein-ring</code> does not support http-kit yet, a workaround is by using
+    <p>lein-ring does not support http-kit yet, a workaround is by using
       <code>ring.middleware.reload</code></p>
 
 {% highlight sh %}
-lein run # start a server in :8080, hot reload code
+lein run # start a server in :8080, hot code reload
 {% endhighlight %}
-
 
     {% highlight clojure %}
 ;; project.clj
@@ -83,7 +82,7 @@ lein run # start a server in :8080, hot reload code
   (GET "/save" [] handler)     ;; websocket
   (route/not-found "<p>Page not found.</p>")) ;; all other, return 404
 
-(defn -main [& args]
+(defn -main [& args] ;; entry point
   (let [handler (if (in-dev? args)
                   (reload/wrap-reload (site #'all-routes)) ;; only reload when dev
                   (site all-routes))]
