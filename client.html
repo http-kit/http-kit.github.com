@@ -14,6 +14,7 @@ title: HTTP client
     <li>Concurrent made easy by asynchronous and promise</li>
     <li>Keep-alived, quite a difference in performance</li>
     <li>Timeout per request</li>
+    <li>HTTPS supported</li>
     <li>Easy to use API, modeled after <a href="https://github.com/dakrone/clj-http">clj-http</a></li>
   </ul>
 
@@ -35,20 +36,9 @@ title: HTTP client
  ; [1] may not always true, since DNS lookup maybe slow
   {% endhighlight %}
 
-  <h3 class="anchor" id="state">Pass state to callback</h3>
-  {% highlight clojure %}
-(defn callback [{:keys [status headers body error opts]}]
-  ;; opts contains :url :method :header + user defined key(s)
-  (let [{:keys [method start-time url]} opts]
-    (println method  url "status" status "takes time"
-             (- (System/currentTimeMillis) start-time) "ms")))
 
-;;; save state for callback, useful for async request
-(let [opts {:start-time (System/currentTimeMillis)}]
-  (http/get "http://http-kit.org" opts callback))
-  {% endhighlight %}
-
-  <h3  class="anchor" id="sync"> synchronous with @promise</h3>
+  <h3 class="anchor" id="sync"> synchronous with @promise</h3>
+<p>Synchronous programming is easy to understand, just like clj-http:</p>
   {% highlight clojure %}
 ;; synchronous
 (let [{:keys [status headers body error] :as resp} @(http/get "http://host.com/path")]
@@ -63,12 +53,51 @@ title: HTTP client
     (println "Async HTTP POST: " status)))
   {% endhighlight %}
 
-  <h3  class="anchor" id="combined">combined, concurrent requests, handle results synchronously</h3>
-  <p>Sent request concurrently, half the waiting time</p>
+  <h3  class="anchor" id="combined">Combined, concurrent requests, handle results synchronously</h3>
+<p>Sent request concurrently, half the waiting time</p>
 
 {% highlight clojure %}
 (let [resp1 (http/get "http://http-kit.org/")
       resp2 (http/get "http://clojure.org/")]
-  (println "Response 1's status " {:status @resp1}) ; wait as necessary
-  (println "Response 2's status " {:status @resp2}))
+  (println "Response 1's status: " (:status @resp1)) ; wait as necessary
+  (println "Response 2's status: " (:status @resp2)))
+
 {% endhighlight %}
+
+{% highlight clojure %}
+(let [urls ["http://server.com/api/1" "http://server.com/api/2"
+            "http://server.com/api/3"]
+      futures (dorun (map http/get urls))]
+  (doseq [f futures]
+    ;; wait for server response concurrently
+    (println (-> @f :opt :url) " status: " (:status @f))
+    ))
+{% endhighlight %}
+
+  <h3 class="anchor" id="reuse">Persistent connection</h3>
+<p>HTTP persistent connection, also called HTTP keep-alive, or HTTP connection reuse, is the idea of using a single TCP connection to send and receive multiple HTTP requests/responses, as opposed to opening a new connection for every single request/response pair</p>
+<p>HTTPS persistent connection is also supported.</p>
+<p>By default, http-kit keeps idle connection for 120s.
+  That can be configured by the  <code>keepalive</code> option:</p>
+{% highlight clojure %}
+ ; keepalive for 30s
+@(http/get "http://http-kit.org" {:keepalive 30000})
+ ; will reuse the previous TCP connection
+@(http/get "http://http-kit.org" {:keepalive 30000})
+ ; disable keepalive for this request
+@(http/get "http://http-kit.org" {:keepalive -1})
+{% endhighlight %}
+
+  <h3 class="anchor" id="state">Pass state to asynchronous callback</h3>
+<p>Sometimes, it's handy to pass some state to callback. You can do it this way:</p>
+  {% highlight clojure %}
+(defn callback [{:keys [status headers body error opts]}]
+  ;; opts contains :url :method :header + user defined key(s)
+  (let [{:keys [method start-time url]} opts]
+    (println method  url "status" status "takes time"
+             (- (System/currentTimeMillis) start-time) "ms")))
+
+;;; save state for callback, useful for async request
+(let [opts {:start-time (System/currentTimeMillis)}]
+  (http/get "http://http-kit.org" opts callback))
+  {% endhighlight %}
