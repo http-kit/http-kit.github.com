@@ -12,9 +12,9 @@ title: HTTP client
   </p>
   <ul>
     <li>Concurrent made easy by asynchronous and promise</li>
-    <li>Keep-alived, quite a difference in performance</li>
+    <li>Keep-alived, quite a difference in performance, <code>{:keepalive -1}</code> to disable</li>
     <li>Timeout per request</li>
-    <li>HTTPS supported</li>
+    <li>HTTPS supported, ~100k of RAM for issuing a HTTPS request. TCP connection, SSLEngine get reused if possible</li>
     <li>Easy to use API, modeled after <a href="https://github.com/dakrone/clj-http">clj-http</a></li>
   </ul>
 
@@ -101,3 +101,26 @@ title: HTTP client
 (let [opts {:start-time (System/currentTimeMillis)}]
   (http/get "http://http-kit.org" opts callback))
   {% endhighlight %}
+
+  <h3 class="anchor" id="coercion">Output coercion</h3>
+{% highlight clojure %}
+
+;; Return the body as a byte stream
+(http/get "http://site.com/favicon.ico" {:as :stream}
+        (fn [{:keys [status headers body error opts]}]
+          ;; body is a java.io.InputStream
+          ))
+;; Coerce as a byte-array
+(http/get "http://site.com/favicon.ico" {:as :byte-array}
+          (fn [{:keys [status headers body error opts]}]
+            ;; body is a byte[]
+            ))
+;; return the body as a string body
+(http/get "http://site.com/string.txt" {:as :text}
+          (fn [{:keys [status headers body error opts]}]
+            ;; body is a java.lang.String
+            ))
+;; Try to automatically coerce the output based on the content-type header, currently supports :text :stream, (with automatic charset detection)
+(http/get "http://site.com/string.txt" {:as :auto})
+
+{% endhighlight %}
