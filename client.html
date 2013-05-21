@@ -67,7 +67,7 @@ title: HTTP client
 {% highlight clojure %}
 (let [urls ["http://server.com/api/1" "http://server.com/api/2"
             "http://server.com/api/3"]
-      futures (dorun (map http/get urls))]
+      futures (doall (map http/get urls))]
   (doseq [f futures]
     ;; wait for server response concurrently
     (println (-> @f :opt :url) " status: " (:status @f))
