@@ -17,15 +17,15 @@ title: Migration from Jetty
   (.stop jetty))
 
 (let [server (run-server app options)]
-  ;; run-server return a function that stops the server
+  ;; run-server returns a function that stops the server
   (server))
   {% endhighlight %}
   <h3 class="anchor" id="https">Configuring HTTPS</h3>
   <p>
-    http-kit relies reverse proxy (like <a href="http://wiki.nginx.org/HttpSslModule">Nginx</a>, <a href="http://redmine.lighttpd.net/projects/1/wiki/Docs_SSL">Lighthttpd</a>) to support HTTPS. <i>They also can be used as <a href="server.html#deploy">reverse proxy to serve static files, compress content.</a></i>
+    http-kit relies on reverse proxy (like <a href="http://wiki.nginx.org/HttpSslModule">Nginx</a>, <a href="http://redmine.lighttpd.net/projects/1/wiki/Docs_SSL">Lighthttpd</a>) to support HTTPS. <i>They also can be used as a <a href="server.html#deploy">reverse proxy to serve static files and compress content.</a></i>
   </p>
   <p>
-    <a href="https://github.com/bumptech/stud">Stud</a> is another option. It works well with websocket and long polling.
+    <a href="https://github.com/bumptech/stud">Stud</a> is another option. It works well with websockets and long polling.
   </p>
   <p>Sample configration for Nginx: </p>
 
@@ -46,14 +46,14 @@ server {
   {% endhighlight %}
   </p>
 
-  <h3 class="anchor" id="reload">Hot code reload(lein ring server)</h3>
+  <h3 class="anchor" id="reload">Hot code reload (lein ring server)</h3>
 
     <p>Hot code reload is very handy, with the Jetty one you can do something like:</p>
     {% highlight sh %}
 lein ring server  # https://github.com/weavejester/lein-ring
     {% endhighlight %}
-    <p>lein-ring does not support http-kit yet, a workaround is by using
-      <code>ring.middleware.reload</code></p>
+    <p>lein-ring does not yet support http-kit, but 
+      <code>ring.middleware.reload</code> can be used as a workaround.</p>
 
 {% highlight sh %}
 lein run # start a server in :8080, hot code reload
