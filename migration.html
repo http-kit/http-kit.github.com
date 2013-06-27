@@ -52,7 +52,7 @@ server {
     {% highlight sh %}
 lein ring server  # https://github.com/weavejester/lein-ring
     {% endhighlight %}
-    <p>lein-ring does not yet support http-kit, but 
+    <p>lein-ring does not yet support http-kit, but
       <code>ring.middleware.reload</code> can be used as a workaround.</p>
 
 {% highlight sh %}
@@ -82,7 +82,7 @@ lein run # start a server in :8080, hot code reload
   (GET "/save" [] handler)     ;; websocket
   (route/not-found "<p>Page not found.</p>")) ;; all other, return 404
 
-(defn -main [& args] ;; entry point
+(defn -main [& args] ;; entry point, lein run will pick up and start from here
   (let [handler (if (in-dev? args)
                   (reload/wrap-reload (site #'all-routes)) ;; only reload when dev
                   (site all-routes))]

@@ -67,11 +67,12 @@ title: HTTP client
 {% highlight clojure %}
 (let [urls ["http://server.com/api/1" "http://server.com/api/2"
             "http://server.com/api/3"]
+      ;; send the request concurrently (asynchronously)
       futures (doall (map http/get urls))]
-  (doseq [f futures]
-    ;; wait for server response concurrently
-    (println (-> @f :opt :url) " status: " (:status @f))
-    ))
+  (doseq [resp futures]
+    ;; wait for server response synchronous
+    (println (-> @resp :opt :url) " status: " (:status @f))
+    )
 {% endhighlight %}
 
   <h3 class="anchor" id="reuse">Persistent connection</h3>
@@ -124,3 +125,25 @@ title: HTTP client
 (http/get "http://site.com/string.txt" {:as :auto})
 
 {% endhighlight %}
+
+  <h3 class="anchor" id="options">Various options</h3>
+{% highlight clojure %}
+
+(http/request {:url "http://http-kit.org/"
+               :method :get             ; :post :put :head or other
+               :user-agent "User-Agent string"
+               :oauth-token "your-token"
+               :headers {"X-header" "value"
+                         "X-Api-Version" "2"}
+               :query-params {"q" "foo, bar"} ;"Nested" query parameters is also supported
+               :form-params {"q" "foo, bar"} ; just like query-params, except sent in the body
+               :basic-auth ["user" "pass"]
+               :keepalive 3000          ; Keep the TCP connection for 3000s
+               :timeout 1000      ; connection timeout and reading timeout
+               :filter (http/max-body-filter (* 1024 * 100)) ; reject if body is more than 100k
+               :insecure? true ; Need to contact a server with an untrusted SSL cert?
+               :query-params})
+
+{% endhighlight %}
+
+  <p><code>http/get</code> <code>http/post</code> etc, is build on top of <code>http/request</code>, so, these options apply to them too</p>

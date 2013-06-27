@@ -37,7 +37,7 @@ title: HTTP server
       <a href="http://stackoverflow.com/questions/417142/what-is-the-maximum-length-of-a-url">relevant discusstion on stackoverflow</a></li>
   </ul>
 
-  <h3 class="anchor" id="channel">Unified Async/Websocket With Channel</h3>
+  <h3 class="anchor" id="channel">Unified Async/Websocket API</h3>
 <p class="red">The with-channel API is not compatible with the RC releases. The new is better and much easier to understand and use. The old's documentation is <a href="server_old.html">here</a></p>
 
 <p>Unified asynchronous channel interface for HTTP (streaming or long-polling) and WebSocket.</p>
@@ -124,16 +124,24 @@ Channel defines the following contract:
 
     <h3 id="polling" class="anchor">Long polling example</h3>
     <p>long polling is very much like streaming</p>
+    <p><a href="https://github.com/http-kit/chat-polling">chat-polling</a> is an real time chat example of using polling</p>
 
 {% highlight clojure %}
+(def channel-hub (atom {}))
+
 (defn handler [request]
   (with-channel request channel
-    (on-some-event ;; wait for event
-     (send! channel {:status 200
-                     :headers {"Content-Type" "application/json; charset=utf-8"}
-                     :body "polling result"}
-        ; send! and close. just be explicit, true is the default for streaming/polling,
-                    true))))
+    ;; Store the channel somewhere, and use it to sent response to client when interesting event happened
+    (swap! channel-hub assoc channel request)
+    (on-close channel (fn [status]
+                        ;; remove from hub when channel get closed
+                        (swap! channel-hub dissoc channel)))))
+
+(on-some-event                          ;; send data to client
+ (doseq [channel (keys @channel-hub)]
+   (send! channel {:status 200
+                   :headers {"Content-Type" "application/json; charset=utf-8"}
+                   :body data})))
 
 (run-server handler {:port 9090})
 {% endhighlight %}
@@ -163,6 +171,9 @@ Channel defines the following contract:
 (run-server handler {:port 9090})
 {% endhighlight %}
 
+<h3 id="handshake" class="anchor">Control WebSocket handshake</h3>
+    <p>The <code>with-channel</code> does the websocket handshake automatically. In case if you want to control it, eg: support websocket handshake.
+      <a href="https://github.com/http-kit/http-kit/issues/64">Here</a> is a working around. cgmartin has a <a href="https://gist.github.com/cgmartin/5880732">gist</a>, is a good place to get inspired.</p>
 
   <h3 id="routing" class="anchor">Routing with Compojure</h3>
   <p>
