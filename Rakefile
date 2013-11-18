@@ -27,7 +27,7 @@ end
 
 desc "Generate site"
 task :generate do
-  sh "jekyll --no-auto"
+  sh "jekyll build"
 end
 
 desc "Watch for change"
