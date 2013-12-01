@@ -55,7 +55,9 @@ Channel defines the following contract:
   </li>
   <li>
     <code>send!</code>:
-    Sends data to client and returns true if the data was successfully sent, or false if the channel is closed. Normally, check the returned value is not needed.
+   Sends data to client and returns true if the data was successfully written to the output queue, or false if the
+    channel is closed. Normally, check the returned value is not needed. This function returns immediately, does not
+    block.
     <div class="send-doc">
       <p class="red">Data is sent directly to the client, NO RING MIDDLEWARE IS APPLIED.</p>
       <p>Data form: {:headers _ :status _ :body _} or just body. Note that :headers
