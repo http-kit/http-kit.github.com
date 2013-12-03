@@ -147,3 +147,16 @@ title: HTTP client
 {% endhighlight %}
 
   <p><code>http/get</code> <code>http/post</code> etc, is build on top of <code>http/request</code>, so, these options apply to them too</p>
+
+  <h3 class="anchor" id="faking">Faking Responses in Tests</h3>
+  <p>Often in tests you want to prevent requests from being sent over HTTP by stubbing out calls to the client.
+    This can be done with <a href="https://github.com/d11wtq/http-kit-fake">http-kit-fake</a>.
+  </p>
+{% highlight clojure %}
+
+(with-fake-http ["http://http-kit.org/" "a fake response"]
+  (http/get {:url "http://http-kit.org/"})) ; promise wrapping the faked response
+
+{% endhighlight %}
+
+<p>See the http-kit-fake <a href="https://github.com/d11wtq/http-kit-fake">README</a> for a full set of options.</p>
