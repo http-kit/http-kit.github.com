@@ -110,6 +110,8 @@ Channel defines the following contract:
   </ul>
 
 {% highlight clojure %}
+(use 'org.httpkit.timer)
+
 (defn handler [request]
   (with-channel request channel
     (on-close channel (fn [status] (println "channel closed, " status)))
