@@ -74,7 +74,7 @@ Channel defines the following contract:
   <li>
     <code>on-close</code>:
     Sets handler (fn [status]) for notification of channel being closed by the
-    server or client. Handler will be invoked at most once. Useful for clean-up
+    server or client. Handler will be invoked at most once. Useful for clean-up. Status can be `:normal`, `:going-away`, `:protocol-error`, `:unsupported`, `:unknown`, `:server-close`, `:client-close`
   </li>
 </ul>
 

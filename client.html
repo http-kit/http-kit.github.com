@@ -138,11 +138,13 @@ title: HTTP client
                :query-params {"q" "foo, bar"} ;"Nested" query parameters is also supported
                :form-params {"q" "foo, bar"} ; just like query-params, except sent in the body
                :basic-auth ["user" "pass"]
-               :keepalive 3000          ; Keep the TCP connection for 3000s
-               :timeout 1000      ; connection timeout and reading timeout
+               :keepalive 3000          ; Keep the TCP connection for 3000ms
+               :timeout 1000      ; connection timeout and reading timeout 1000ms
                :filter (http/max-body-filter (* 1024 * 100)) ; reject if body is more than 100k
                :insecure? true ; Need to contact a server with an untrusted SSL cert?
-               :query-params})
+               :max-redirects 10 ; Max redirects to follow
+               :follow-redirects false ; whether follow 301/302 redirects automatically, default to true, saved in `:trace-redirects`
+               })
 
 {% endhighlight %}
 
