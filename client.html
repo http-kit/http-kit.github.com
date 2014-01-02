@@ -126,6 +126,34 @@ title: HTTP client
 
 {% endhighlight %}
 
+  <h3 class="anchor" id="nested-params">Nested params</h3>
+<p>
+  httpkit has some supports for nested params, like <code>clj-http</code> does.
+{% highlight clojure %}
+{:query-params {:a {:b {:c 5} :e {:f 6}}}} => "a[e][f]=6&a[b][c]=5"
+{% endhighlight %}
+
+  httpkit and clj-http do so by <code>encoding</code> the nested data structure, expect server understand the encoding, and do the proper decoding.
+
+  This is not robust. Recommanded usage is do the encoding and decoding explicitly, using your favorite encoding.
+
+</p>
+<p>Take json for example: </p>
+ {% highlight clojure %}
+(require '[clojure.data.json :as json])
+
+(http/post "http://your-server/api"
+           ;; using json to encode the nested params before pass to httpkit
+           {:query-params {:a (json/write-str {:b {:c 5} :e {:f 6}})}})
+
+;; on the server side, get the param, decode it using json/read-str.
+;; json support more data structure, easier to understand and reason.
+;; It's also cross language, has minimum requirement for your server's implementation
+ {% endhighlight %}
+
+
+
+
   <h3 class="anchor" id="options">Various options</h3>
 {% highlight clojure %}
 
@@ -135,20 +163,29 @@ title: HTTP client
                :oauth-token "your-token"
                :headers {"X-header" "value"
                          "X-Api-Version" "2"}
-               :query-params {"q" "foo, bar"} ;"Nested" query parameters is also supported
+               :query-params {"q" "foo, bar"} ;"Nested" query parameters are also supported
                :form-params {"q" "foo, bar"} ; just like query-params, except sent in the body
                :basic-auth ["user" "pass"]
                :keepalive 3000          ; Keep the TCP connection for 3000ms
                :timeout 1000      ; connection timeout and reading timeout 1000ms
                :filter (http/max-body-filter (* 1024 * 100)) ; reject if body is more than 100k
                :insecure? true ; Need to contact a server with an untrusted SSL cert?
+
+               ;; File upload. :content can be a java.io.File, java.io.InputStream, String
+               ;; It read the whole content before send them to server:
+               ;; should be used when the file is small, say, a few megabytes
+               :multipart [{:name "comment" :content "httpkit's project.clj"}
+                           {:name "file" :content (clojure.java.io/file "project.clj") :filename "project.clj"}]
+
                :max-redirects 10 ; Max redirects to follow
-               :follow-redirects false ; whether follow 301/302 redirects automatically, default to true, saved in `:trace-redirects`
+                ;; whether follow 301/302 redirects automatically, default to true
+                ;; :trace-redirects will contain the chain of the redirections followed.
+               :follow-redirects false
                })
 
 {% endhighlight %}
 
-  <p><code>http/get</code> <code>http/post</code> etc, is build on top of <code>http/request</code>, so, these options apply to them too</p>
+  <p><code>http/get</code> <code>http/post</code> etc, are build on top of <code>http/request</code>, so, these options apply to them too</p>
 
   <h3 class="anchor" id="faking">Faking Responses in Tests</h3>
   <p>Often in tests you want to prevent requests from being sent over HTTP by stubbing out calls to the client.

@@ -191,7 +191,7 @@ Channel defines the following contract:
       org.httpkit.server)
 
 (defn show-landing-page [req] ;; ordinary clojure function, accepts a request map, returns a response map
-  ;; return landing page's html string. possible template library:
+  ;; return landing page's html string. Using template library is a good idea:
   ;; mustache (https://github.com/shenfeng/mustache.clj, https://github.com/fhd/clostache...)
   ;; enlive (https://github.com/cgrand/enlive)
   ;; hiccup(https://github.com/weavejester/hiccup)
