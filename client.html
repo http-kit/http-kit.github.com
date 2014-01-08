@@ -168,7 +168,7 @@ title: HTTP client
                :basic-auth ["user" "pass"]
                :keepalive 3000          ; Keep the TCP connection for 3000ms
                :timeout 1000      ; connection timeout and reading timeout 1000ms
-               :filter (http/max-body-filter (* 1024 * 100)) ; reject if body is more than 100k
+               :filter (http/max-body-filter (* 1024 100)) ; reject if body is more than 100k
                :insecure? true ; Need to contact a server with an untrusted SSL cert?
 
                ;; File upload. :content can be a java.io.File, java.io.InputStream, String
