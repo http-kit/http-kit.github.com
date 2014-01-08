@@ -37,6 +37,35 @@ title: HTTP server
       <a href="http://stackoverflow.com/questions/417142/what-is-the-maximum-length-of-a-url">relevant discusstion on stackoverflow</a></li>
   </ul>
 
+  <h3 class="anchor" id="stop-server">Stop/Restart Server</h3>
+
+<p>
+  <code>run-server</code> returns a function that stops the server. which can take an optional timeout(ms) param to wait existing requests to be finished.
+</p>
+
+{% highlight clojure %}
+(defn app [req]
+  {:status  200
+   :headers {"Content-Type" "text/html"}
+   :body    "hello HTTP!"})
+
+(defonce server (atom nil))
+
+(defn stop-server []
+  (when-not (nil? @server)
+    ;; graceful shutdown: wait 100ms for existing requests to be finished
+    ;; :timeout is optional, when no timeout, stop immediately
+    (@server :timeout 100)
+    (reset! server nil)))
+
+(defn -main [&args]
+  ;; The #' is useful, when you want to hot-reload code
+  ;; You may want to take a look: https://github.com/clojure/tools.namespace
+  ;; and http://http-kit.org/migration.html#reload
+  (reset! server (run-server #'app)))
+{% endhighlight %}
+
+
   <h3 class="anchor" id="channel">Unified Async/Websocket API</h3>
 <p class="red">The with-channel API is not compatible with the RC releases. The new is better and much easier to understand and use. The old's documentation is <a href="server_old.html">here</a></p>
 
