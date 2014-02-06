@@ -125,7 +125,7 @@ Channel defines the following contract:
            ;; When unspecified, `close-after-send?` defaults to true for HTTP channels
            ;; and false for WebSocket.  (send! channel data close-after-send?)
                           (send! channel data))))) ; data is sent directly to the client
-(run-server chat-handler {:port 8080})
+(run-server handler {:port 8080})
 {% endhighlight %}
 
   <h3 class="anchor" id="async">HTTP Streaming example</h3>
