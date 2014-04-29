@@ -111,6 +111,11 @@
     // var $spy = $(this).scrollspy('refresh');
   // });
 
+      $('.bs-docs-sidebar a').click(function() {
+          var label = $(this).text();
+          ga('send', 'event', 'nav', 'click', label, 1);
+      });
+
 })();
     </script>
     <script>
