@@ -27,20 +27,20 @@ title: HTTP server
   <h4>Options:</h4>
   <ul>
     <li><code>:ip</code>: which IP to bind, default to <code>0.0.0.0</code></li>
-    <li><code>:port</code>: which port listens incomming request, default to 8090</li>
+    <li><code>:port</code>: which port listens for incoming requests, default to 8090</li>
     <li><code>:thread</code>: How many threads to compute response from request, default to 4</li>
-    <li><code>:worker-name-prefix</code>: woker thread name prefix, default to <code>worker-</code>: <code>worker-1</code> <code>worker-2</code>....</li>
-    <li><code>:queue-size</code>: max requests queued waiting for threadpool to compute response before reject, 503(Service Unavailable) is returned to client if queue is full, default to 20K</li>
-    <li><code>:max-body</code>: length limit for request body in bytes, 413(Request Entity Too Large) is returned if exceeds this limit, default to 8388608(8M)</li>
-    <li><code>:max-line</code>: length limit for HTTP inital line and per header,
-      414(Request-URI Too Long) will be returned if exceeds this limit, default to 4096(4K),
-      <a href="http://stackoverflow.com/questions/417142/what-is-the-maximum-length-of-a-url">relevant discusstion on stackoverflow</a></li>
+    <li><code>:worker-name-prefix</code>: worker thread name prefix, default to <code>worker-</code>: <code>worker-1</code> <code>worker-2</code>....</li>
+    <li><code>:queue-size</code>: max requests queued waiting for thread pool to compute response before rejecting, 503(Service Unavailable) is returned to client if queue is full, default to 20K</li>
+    <li><code>:max-body</code>: length limit for request body in bytes, 413(Request Entity Too Large) is returned if request exceeds this limit, default to 8388608(8M)</li>
+    <li><code>:max-line</code>: length limit for HTTP initial line and per header,
+      414(Request-URI Too Long) will be returned if exceeding this limit, default to 4096(4K),
+      <a href="http://stackoverflow.com/questions/417142/what-is-the-maximum-length-of-a-url">relevant discussion on Stack Overflow</a></li>
   </ul>
 
   <h3 class="anchor" id="stop-server">Stop/Restart Server</h3>
 
 <p>
-  <code>run-server</code> returns a function that stops the server. which can take an optional timeout(ms) param to wait existing requests to be finished.
+  <code>run-server</code> returns a function that stops the server, which can take an optional timeout(ms) param to wait for existing requests to be finished.
 </p>
 
 {% highlight clojure %}
@@ -59,7 +59,7 @@ title: HTTP server
     (reset! server nil)))
 
 (defn -main [&args]
-  ;; The #' is useful, when you want to hot-reload code
+  ;; The #' is useful when you want to hot-reload code
   ;; You may want to take a look: https://github.com/clojure/tools.namespace
   ;; and http://http-kit.org/migration.html#reload
   (reset! server (run-server #'app {:port 8080})))
@@ -67,7 +67,7 @@ title: HTTP server
 
 
   <h3 class="anchor" id="channel">Unified Async/Websocket API</h3>
-<p class="red">The with-channel API is not compatible with the RC releases. The new is better and much easier to understand and use. The old's documentation is <a href="server_old.html">here</a></p>
+<p class="red">The with-channel API is not compatible with the RC releases. The new one is better and much easier to understand and use. The old documentation is <a href="server_old.html">here</a></p>
 
 <p>Unified asynchronous channel interface for HTTP (streaming or long-polling) and WebSocket.</p>
 
@@ -85,8 +85,8 @@ Channel defines the following contract:
   <li>
     <code>send!</code>:
    Sends data to client and returns true if the data was successfully written to the output queue, or false if the
-    channel is closed. Normally, check the returned value is not needed. This function returns immediately, does not
-    block.
+    channel is closed. Normally, checking the returned value is not needed. This function returns immediately (does not
+    block).
     <div class="send-doc">
       <p class="red">Data is sent directly to the client, NO RING MIDDLEWARE IS APPLIED.</p>
       <p>Data form: {:headers _ :status _ :body _} or just body. Note that :headers
@@ -132,10 +132,10 @@ Channel defines the following contract:
 
   <ul>
     <li>First call of <code>send!</code>,
-      send HTTP status and Headers to client</li>
-    <li>After the first, <code>send!</code> send a chunk to client</li>
-    <li> <code>close</code> send an empty chunk to client, mark as end of the response </li>
-    <li>Client close notification via <code>on-close</code></li>
+      sends HTTP status and Headers to client</li>
+    <li>After the first, <code>send!</code> sends a chunk to client</li>
+    <li> <code>close</code> sends an empty chunk to client, marking the end of the response</li>
+    <li>Client close notification printed via <code>on-close</code></li>
   </ul>
 
 {% highlight clojure %}
@@ -146,7 +146,7 @@ Channel defines the following contract:
     (on-close channel (fn [status] (println "channel closed, " status)))
     (loop [id 0]
       (when (< id 10)
-        (schedule-task (* id 200) ;; sent a message every 200ms
+        (schedule-task (* id 200) ;; send a message every 200ms
                        (send! channel (str "message from server #" id) false)) ; false => don't close after send
         (recur (inc id))))
     (schedule-task 10000 (close channel)))) ;; close in 10s.
@@ -156,7 +156,7 @@ Channel defines the following contract:
 {% endhighlight %}
 
     <h3 id="polling" class="anchor">Long polling example</h3>
-    <p>long polling is very much like streaming</p>
+    <p>Long polling is very much like streaming</p>
     <p><a href="https://github.com/http-kit/chat-polling">chat-polling</a> is a realtime chat example of using polling</p>
 
 {% highlight clojure %}
@@ -164,7 +164,7 @@ Channel defines the following contract:
 
 (defn handler [request]
   (with-channel request channel
-    ;; Store the channel somewhere, and use it to sent response to client when interesting event happened
+    ;; Store the channel somewhere, and use it to send response to client when interesting event happens
     (swap! channel-hub assoc channel request)
     (on-close channel (fn [status]
                         ;; remove from hub when channel get closed
@@ -179,11 +179,11 @@ Channel defines the following contract:
 (run-server handler {:port 9090})
 {% endhighlight %}
 
-<h3 id="websocket" class="anchor">Websocket example</h3>
+<h3 id="websocket" class="anchor">WebSocket example</h3>
 
 <ul>
-  <li>Two way communication bettween client and server</li>
-  <li>Can Easy degradate to HTTP long polling/streaming, since the unified API</li>
+  <li>Two-way communication between client and server</li>
+  <li>Can easily degrade to HTTP long polling/streaming, due to the unified API</li>
   <li>
     <code>send!</code> with <code>java.lang.String</code>, a text frame assembled and sent to client
   </li>
@@ -191,7 +191,7 @@ Channel defines the following contract:
     <code>send!</code> with <code>java.io.InputStream</code> or <code>byte[]</code>, a binary frame assembled and sent to client
   </li>
   <li>For WebSocket Secure connection, one option is <a href="https://github.com/bumptech/stud">stud</a> (self-signed certificate may not work with websocket).
-    <a href="http://nginx.com/news/nginx-websockets.html">Nginx</a> can do it too.</li>
+    <a href="http://nginx.com/news/nginx-websockets.html">Nginx</a> can do it, too.</li>
 </ul>
 
 {% highlight clojure %}
@@ -205,12 +205,12 @@ Channel defines the following contract:
 {% endhighlight %}
 
 <h3 id="handshake" class="anchor">Control WebSocket handshake</h3>
-    <p>The <code>with-channel</code> does the websocket handshake automatically. In case if you want to control it, eg: support websocket handshake.
-      <a href="https://github.com/http-kit/http-kit/issues/64">Here</a> is a working around. cgmartin has a <a href="https://gist.github.com/cgmartin/5880732">gist</a>, is a good place to get inspired.</p>
+    <p>The <code>with-channel</code> does the WebSocket handshake automatically. In case if you want to control it, e.g., to support WebSocket subprotocol,
+      <a href="https://github.com/http-kit/http-kit/issues/64">here</a> is a workaround. cgmartin's <a href="https://gist.github.com/cgmartin/5880732">gist</a> is a good place to get inspired.</p>
 
   <h3 id="routing" class="anchor">Routing with Compojure</h3>
   <p>
-    <a href="https://github.com/weavejester/compojure">Compojure</a> Can be used to do the routing, based on uri and method
+    <a href="https://github.com/weavejester/compojure">Compojure</a> can be used to do the routing, based on uri and method
   </p>
 
 {% highlight clojure %}
@@ -251,20 +251,20 @@ Channel defines the following contract:
     <a href="http://www.lighttpd.net/">Lighthttpd</a>, etc in serious production is encouraged.
     They can also be used to <a href="migration.html#https">add https support</a>.</p>
   <ul>
-    <li>They are fast, heavily optimized for static contents.</li>
+    <li>They are fast and heavily optimized for static content.</li>
     <li>They can be configured to compress the content sent to browsers</li>
   </ul>
   <p>Sample Nginx configration:</p>
   {% highlight sh %}
 upstream http_backend {
     server 127.0.0.1:8090;  # http-kit listen on 8090
-    # put more server here for load balance
+    # put more servers here for load balancing
     # keepalive(resue TCP connection) improves performance
     keepalive 32;  # both http-kit and nginx are good at concurrency
 }
 
 server {
-    location /static/ {  # static contents
+    location /static/ {  # static content
         alias   /var/www/xxxx/public/;
     }
     location / {

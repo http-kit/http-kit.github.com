@@ -11,11 +11,11 @@ title: HTTP client
     Like the Server, the client uses an event-driven, non-blocking I/O model. It's lightweight and efficient.
   </p>
   <ul>
-    <li>Concurrent made easy by asynchronous and promise</li>
-    <li>Keep-alived, quite a difference in performance, <code>{:keepalive -1}</code> to disable</li>
+    <li>Concurrency made easy by asynchronicity and promises</li>
+    <li>Keep-alive makes quite a difference in performance, and can be disabled with <code>{:keepalive -1}</code></li>
     <li>Timeout per request</li>
-    <li>HTTPS supported, ~100k of RAM for issuing a HTTPS request. TCP connection, SSLEngine get reused if possible</li>
-    <li>Easy to use API, modeled after <a href="https://github.com/dakrone/clj-http">clj-http</a></li>
+    <li>HTTPS supported, ~100k of RAM for issuing a HTTPS request. TCP connection and SSLEngine get reused if possible</li>
+    <li>Easy-to-use API, modeled after <a href="https://github.com/dakrone/clj-http">clj-http</a></li>
   </ul>
 
   <h3 id="async" class="anchor">asynchronous with promise, callback</h3>
@@ -29,7 +29,7 @@ title: HTTP client
               :user-agent "User-Agent-string"
               :headers {"X-Header" "Value"}})
 (http/get "http://host.com/path" options
-          (fn [{:keys [status headers body error]}] ;; asynchronous handle response
+          (fn [{:keys [status headers body error]}] ;; asynchronous response handling
             (if error
               (println "Failed, exception is " error)
               (println "Async HTTP GET: " status))))
@@ -54,7 +54,7 @@ title: HTTP client
   {% endhighlight %}
 
   <h3  class="anchor" id="combined">Combined, concurrent requests, handle results synchronously</h3>
-<p>Sent request concurrently, half the waiting time</p>
+<p>Send request concurrently, with half the waiting time</p>
 
 {% highlight clojure %}
 (let [resp1 (http/get "http://http-kit.org/")
@@ -70,7 +70,7 @@ title: HTTP client
       ;; send the request concurrently (asynchronously)
       futures (doall (map http/get urls))]
   (doseq [resp futures]
-    ;; wait for server response synchronous
+    ;; wait for server response synchronously
     (println (-> @resp :opt :url) " status: " (:status @resp))
     )
 {% endhighlight %}
@@ -78,7 +78,7 @@ title: HTTP client
   <h3 class="anchor" id="reuse">Persistent connection</h3>
 <p>HTTP persistent connection, also called HTTP keep-alive, or HTTP connection reuse, is the idea of using a single TCP connection to send and receive multiple HTTP requests/responses, as opposed to opening a new connection for every single request/response pair</p>
 <p>HTTPS persistent connection is also supported.</p>
-<p>By default, http-kit keeps idle connection for 120s.
+<p>By default, http-kit keeps idle connections for 120s.
   That can be configured by the  <code>keepalive</code> option:</p>
 {% highlight clojure %}
  ; keepalive for 30s
@@ -138,7 +138,7 @@ title: HTTP client
   This is not robust. Recommanded usage is do the encoding and decoding explicitly, using your favorite encoding.
 
 </p>
-<p>Take json for example: </p>
+<p>Take JSON for example: </p>
  {% highlight clojure %}
 (require '[clojure.data.json :as json])
 
@@ -147,7 +147,7 @@ title: HTTP client
            {:query-params {:a (json/write-str {:b {:c 5} :e {:f 6}})}})
 
 ;; on the server side, get the param, decode it using json/read-str.
-;; json support more data structure, easier to understand and reason.
+;; json supports more data structure and is easier to understand and reason about.
 ;; It's also cross language, has minimum requirement for your server's implementation
  {% endhighlight %}
 
