@@ -165,6 +165,7 @@ title: HTTP client
                          "X-Api-Version" "2"}
                :query-params {"q" "foo, bar"} ;"Nested" query parameters are also supported
                :form-params {"q" "foo, bar"} ; just like query-params, except sent in the body
+               :body (json/encode {"key" "value"}) ; use this for content-type json
                :basic-auth ["user" "pass"]
                :keepalive 3000          ; Keep the TCP connection for 3000ms
                :timeout 1000      ; connection timeout and reading timeout 1000ms
