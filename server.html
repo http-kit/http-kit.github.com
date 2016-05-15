@@ -58,7 +58,7 @@ title: HTTP server
     (@server :timeout 100)
     (reset! server nil)))
 
-(defn -main [&args]
+(defn -main [& args]
   ;; The #' is useful when you want to hot-reload code
   ;; You may want to take a look: https://github.com/clojure/tools.namespace
   ;; and http://http-kit.org/migration.html#reload
