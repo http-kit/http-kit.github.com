@@ -239,8 +239,8 @@ Channel defines the following contract:
   (context "/user/:id" []
            (GET / [] get-user-by-id)
            (POST / [] update-userinfo))
-  (route/files "/static/") ;; static file url prefix /static, in `public` folder
-  (route/not-found "<p>Page not found.</p>")) ;; all other, return 404
+  (files "/static/") ;; static file url prefix /static, in `public` folder
+  (not-found "<p>Page not found.</p>")) ;; all other, return 404
 
 (run-server (site #'all-routes) {:port 8080})
   {% endhighlight %}
