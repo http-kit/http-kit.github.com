@@ -215,7 +215,6 @@ Channel defines the following contract:
 
 {% highlight clojure %}
 (:use [compojure.route :only [files not-found]]
-      [compojure.handler :only [site]] ; form, query params decode; cookie; session, etc
       [compojure.core :only [defroutes GET POST DELETE ANY context]]
       org.httpkit.server)
 
@@ -242,7 +241,7 @@ Channel defines the following contract:
   (files "/static/") ;; static file url prefix /static, in `public` folder
   (not-found "<p>Page not found.</p>")) ;; all other, return 404
 
-(run-server (site #'all-routes) {:port 8080})
+(run-server all-routes {:port 8080})
   {% endhighlight %}
 
   <h3 class="anchor" id="deploy">Recommended server deployment</h3>
