@@ -171,6 +171,7 @@ title: HTTP client
                :timeout 1000      ; connection timeout and reading timeout 1000ms
                :filter (http/max-body-filter (* 1024 100)) ; reject if body is more than 100k
                :insecure? true ; Need to contact a server with an untrusted SSL cert?
+               :proxy "http://username:password@172.103.88.225:80"
 
                ;; File upload. :content can be a java.io.File, java.io.InputStream, String
                ;; It read the whole content before send them to server:
