@@ -71,7 +71,7 @@ title: HTTP client
       futures (doall (map http/get urls))]
   (doseq [resp futures]
     ;; wait for server response synchronously
-    (println (-> @resp :opt :url) " status: " (:status @resp))
+    (println (-> @resp :opts :url) " status: " (:status @resp))
     )
 {% endhighlight %}
 
