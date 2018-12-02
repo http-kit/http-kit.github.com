@@ -82,7 +82,7 @@ lein run # start a server in :8080, hot code reload
   (GET "/save" [] handler)     ;; websocket
   (route/not-found "<p>Page not found.</p>")) ;; all other, return 404
 
-(defn in-dev? true) ;; TODO read a config variable from command line, env, or file?
+(defn in-dev? [&] true) ;; TODO read a config variable from command line, env, or file?
 
 (defn -main [& args] ;; entry point, lein run will pick up and start from here
   (let [handler (if (in-dev? args)
