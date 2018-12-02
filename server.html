@@ -33,7 +33,7 @@ title: HTTP server
     <li><code>:queue-size</code>: max requests queued waiting for thread pool to compute response before rejecting, 503(Service Unavailable) is returned to client if queue is full, default to 20K</li>
     <li><code>:max-body</code>: length limit for request body in bytes, 413(Request Entity Too Large) is returned if request exceeds this limit, default to 8388608(8M)</li>
     <li><code>:max-line</code>: length limit for HTTP initial line and per header,
-      414(Request-URI Too Long) will be returned if exceeding this limit, default to 4096(4K),
+      414(Request-URI Too Long) will be returned if exceeding this limit, default to 8192(8K),
       <a href="http://stackoverflow.com/questions/417142/what-is-the-maximum-length-of-a-url">relevant discussion on Stack Overflow</a></li>
   </ul>
 
