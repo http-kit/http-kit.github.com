@@ -75,6 +75,7 @@ lein run # start a server in :8080, hot code reload
   (:use [org.httpkit.server :only [run-server]])
   (:require [ring.middleware.reload :as reload]
             [compojure.handler :refer [site]]
+            [compojure.route :as route]
             [compojure.core :refer [defroutes GET POST]]))
 
 (defroutes all-routes
