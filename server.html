@@ -61,7 +61,7 @@ title: HTTP server
 (defn -main [& args]
   ;; The #' is useful when you want to hot-reload code
   ;; You may want to take a look: https://github.com/clojure/tools.namespace
-  ;; and http://http-kit.org/migration.html#reload
+  ;; and https://http-kit.github.io/migration.html#reload
   (reset! server (run-server #'app {:port 8080})))
 {% endhighlight %}
 
