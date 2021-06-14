@@ -6,9 +6,9 @@ status: publish
 title: http-kit is clean and small, less is exponentially more
 ---
 
-* [HTTP server](http://http-kit.org/server.html): event-driven, ring adapter, websocket extension, asynchronous extension
-* [HTTP Client](http://http-kit.org/client.html): event-driven, asynchronous with promise, synchronous with @promise, keep-alive
-* [Timer facility](http://http-kit.org/timer.html)
+* [HTTP server](http://http-kit.github.io/server.html): event-driven, ring adapter, websocket extension, asynchronous extension
+* [HTTP Client](http://http-kit.github.io/client.html): event-driven, asynchronous with promise, synchronous with @promise, keep-alive
+* [Timer facility](http://http-kit.github.io/timer.html)
 
 
 All the above + high concurrency + high performance + nice API + written from scrach = ~3K lines of code.
@@ -35,3 +35,4 @@ Less is exponentially more
 *cloc runned time: Tue Feb  5 23:23:58 CST 2013, on master branch, from src directory*
 
 *Edit: 2013/3/29 with release 2.0.0, the codebase is slightly larger: 2970 lines of Java, 266 lines of Clojure*
+*Edit: 2021/6/14: fix URLs*

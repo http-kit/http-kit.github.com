@@ -57,7 +57,7 @@ title: HTTP client
 <p>Send request concurrently, with half the waiting time</p>
 
 {% highlight clojure %}
-(let [resp1 (http/get "http://http-kit.org/")
+(let [resp1 (http/get "http://http-kit.github.io/")
       resp2 (http/get "http://clojure.org/")]
   (println "Response 1's status: " (:status @resp1)) ; wait as necessary
   (println "Response 2's status: " (:status @resp2)))
@@ -82,11 +82,11 @@ title: HTTP client
   That can be configured by the  <code>keepalive</code> option:</p>
 {% highlight clojure %}
  ; keepalive for 30s
-@(http/get "http://http-kit.org" {:keepalive 30000})
+@(http/get "http://http-kit.github.io" {:keepalive 30000})
  ; will reuse the previous TCP connection
-@(http/get "http://http-kit.org" {:keepalive 30000})
+@(http/get "http://http-kit.github.io" {:keepalive 30000})
  ; disable keepalive for this request
-@(http/get "http://http-kit.org" {:keepalive -1})
+@(http/get "http://http-kit.github.io" {:keepalive -1})
 {% endhighlight %}
 
   <h3 class="anchor" id="state">Pass state to asynchronous callback</h3>
@@ -100,7 +100,7 @@ title: HTTP client
 
 ;;; save state for callback, useful for async request
 (let [opts {:start-time (System/currentTimeMillis)}]
-  (http/get "http://http-kit.org" opts callback))
+  (http/get "http://http-kit.github.io" opts callback))
   {% endhighlight %}
 
   <h3 class="anchor" id="coercion">Output coercion</h3>
@@ -157,7 +157,7 @@ title: HTTP client
   <h3 class="anchor" id="options">Various options</h3>
 {% highlight clojure %}
 
-(http/request {:url "http://http-kit.org/"
+(http/request {:url "http://http-kit.github.io/"
                :method :get             ; :post :put :head or other
                :user-agent "User-Agent string"
                :oauth-token "your-token"
@@ -194,8 +194,8 @@ title: HTTP client
   </p>
 {% highlight clojure %}
 
-(with-fake-http ["http://http-kit.org/" "a fake response"]
-  (http/get {:url "http://http-kit.org/"})) ; promise wrapping the faked response
+(with-fake-http ["http://http-kit.github.io/" "a fake response"]
+  (http/get {:url "http://http-kit.github.io/"})) ; promise wrapping the faked response
 
 {% endhighlight %}
 
