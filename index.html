@@ -41,7 +41,7 @@ title: Home
           <h3>HTTP Client <a class="more" href="client.html">documentation</a></h3>
           {% highlight clojure %}
 ;; start concurrent requests, get promise, half the waiting time
-(let [response1 (http-kit/get "http://http-kit.org/")
+(let [response1 (http-kit/get "http://http-kit.github.io/")
       response2 (http-kit/get "http://clojure.org/")]
   ;; Handle responses one-by-one, blocking as necessary
   ;; Other keys :headers :body :error :opts
